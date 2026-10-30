@@ -1,190 +1,78 @@
-# Nimbus — Clock & Weather for AWTRIX NG
+# Nimbus Clock Weather – Polska Wersja (AWTRIX Light / Awtrix NG)
 
-A clock app for [AWTRIX NG](https://github.com/Blueforcer/awtrix-ng) that draws the time and calendar exactly like the clock built into AWTRIX (the Time app on the TC001, the clock faces on the TC002), and turns the calendar into a carousel: date, outdoor temperature, weather icon, room temperature and humidity. Weather comes from [Open-Meteo](https://open-meteo.com): free, no account, no API key. Everything is built in, so there are no icons to install.
+[![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
+[![Version](https://img.shields.io/badge/version-2.2%20PL-brightgreen.svg)]()
 
-### TC001
+Zmodyfikowana i w pełni spolszczona wersja aplikacji **Nimbus** dla zegarów małych matryc LED sterowanych systemem **AWTRIX Light / Awtrix NG**. 
 
-| Date | Temperature |
-|:---:|:---:|
-| ![Calendar panel](docs/date.png) | ![Temperature panel](docs/temperature.png) |
-| **Weather** | **Night mode** |
-| ![Weather icon panel](docs/icon.png) | ![Night mode](docs/night.png) |
+Aplikacja wyświetla zegar (w kilku wariantach tarcz), kalendarz, rozbudowaną pogodę z serwisu Open-Meteo, odczyty temperatury oraz wilgotności w pomieszczeniu (z czujników lokalnych lub MQTT), a także oferuje automatyczny tryb nocny i efekty przejść.
 
-### TC002
+---
 
-| Sheet | Ring |
-|:---:|:---:|
-| ![Sheet face](docs/tc002-sheet.png) | ![Ring face](docs/tc002-ring.png) |
-| **Flap** | **Big** |
-| ![Flap face](docs/tc002-flap.png) | ![Big face](docs/tc002-big.png) |
-| **Temperature** | **Weather** |
-| ![Temperature panel](docs/tc002-temperature.png) | ![Weather icon panel](docs/tc002-icon.png) |
-| **Weather on the big face** | **Night mode** |
-| ![Weather on the big face](docs/tc002-big-weather.png) | ![Night mode](docs/tc002-night.png) |
+## 🚀 Co nowego w wersji 2.2 PL (Zmiany w forku)
 
-<sub>Real frames captured from the AWTRIX NG simulators, with the time set to 13:37 for the screenshots.</sub>
+### 1. 🇵🇱 Pełne spolszczenie panelu WWW
+- Spolszczone wszystkie nazwy opcji, grupy ustawień, podpowiedzi (`help`) oraz listy wyboru (`select`) w panelu konfiguracyjnym AWTRIX.
+- Domyślny język opisów pogodowych ustawiony na **Polski**.
 
-**Get it on the AWTRIX Hub: [awtrix.de/flow/RRngmhaqcgQM](https://awtrix.de/flow/RRngmhaqcgQM)**
+### 2. 🌤️ Rozszerzona obsługa pogody (10 stanów z Open-Meteo)
+- Rozbudowano parser i silnik renderowania ikonek z 7 do **10 dokładnych stanów pogodowych** WMO:
+  1. **Słonecznie** (`CLEAR`)
+  2. **Zachmurzenie** (`PARTLY`)
+  3. **Chmury** (`CLOUDY`)
+  4. **Mgła** (`FOG`)
+  5. **Mżawka** (`DRIZZLE`)
+  6. **Deszcz** (`RAIN`)
+  7. **Ulewa** (`HEAVY RAIN`)
+  8. **Śnieg** (`SNOW`)
+  9. **Śnieżyca** (`HEAVY SNOW`)
+  10. **Burza** (`STORM`)
+- Dodano dedykowane polskie opisy oraz dopasowane animacje pikselowe dla mżawki, ulewy i śnieżycy.
 
-## Features
+### 3. 🧹 Efekt "Wycieraczki" (Czyszczenie matrycy co 5 min)
+- Dodano płynny efekt czyszczący – czarny pas o szerokości 8 pikseli przesuwający się z prawej do lewej strony ekranu dokładnie co 5 minut (`minute() % 5 == 0`).
+- Efekt trwa 800 ms, odświeża diody LED i redukuje ryzyko utrwalania powidoków (burn-in), nadając zegarowi unikalny styl retro-skanera.
+- Mżliwość włączenia/wyłączenia w sekcji **Wyświetlacz** w panelu konfiguracyjnym.
 
-- **The official clock and calendar**, pixel for pixel: the Time app on the TC001, the `sheet`, `ring`, `flap` and `big` faces on the TC002; 12/24 h, leading zero, colon steady / blinking / pulsing, time and calendar colors
-- **One file per clock**: `nimbus-tc001.ax` for the TC001 (32×8), `nimbus-tc002.ax` for the TC002 (52×16)
-- **Week bar** like the official app: on/off, week starting Monday or Sunday, separate colors for today and for weekends
-- **Carousel** in the calendar's place: `date`, `temp`, `weather`, `room`, `humidity`, in the order you choose
-- **8 transitions**: wipe, fade, pixel morph, scroll up/down, slide left/right, or none
-- **Temperature color that follows the weather**: blue at 10 °C and below, orange around 20 °C, red from 30 °C
-- **8 built-in animated weather icons**, day/night aware
-- **Room values** from the clock's own sensor or from MQTT (Home Assistant friendly)
-- **Night mode**: the official plain layout in red (on the TC002, the big face's time), manual, scheduled or over MQTT; optional week bar, app rotation pause and night brightness
+### 4. 🛠️ Poprawki stabilności i parsera Berry
+- Wyeliminowano błędy parsera Berry (`syntax_error`) przy parsowaniu odpowiedzi JSON z Open-Meteo poprzez zmianę dekodowania cudzysłowów w wyrażeniach regularnych `re.search`.
+- Zachowano pełną wsteczną kompatybilność z angielskimi kluczami konfiguracji.
 
-## Installation
+---
 
-**From the AWTRIX Hub:** install [Nimbus from awtrix.de](https://awtrix.de/flow/RRngmhaqcgQM).
+## ⚙️ Instrukcja instalacji
 
-**Manually:** create a new script in the AWTRIX NG web UI and paste the file for your clock, [`dist/nimbus-tc001.ax`](dist/nimbus-tc001.ax) or [`dist/nimbus-tc002.ax`](dist/nimbus-tc002.ax), or upload it over HTTP:
+1. Pobierz plik `Nimbus-Clock-Weather.ax` z najnowszego wydania lub bezpośrednio z tego repozytorium.
+2. Otwórz panel panel zarządzania przeglądarki Twojego zegara AWTRIX (adres IP zegara w sieci lokalnej).
+3. Przejdź do zakładki **Files** / **App Store** lub wejdź przez FTP/Samba do pamięci zegara.
+4. Wgraj plik `Nimbus-Clock-Weather.ax` do katalogu aplikacji (`/apps/` lub bezpośrednio przez edytor plików w panelu).
+5. Zrestartuj zegar lub przeładuj aplikacje.
+6. W ustawieniach aplikacji wprowadź współrzędne geograficzne (Szerokość `Lat` i Długość `Lon`) swojej miejscowości dla celów prognozy pogody.
 
-```sh
-curl -X PUT -H "Content-Type: text/plain" --data-binary @dist/nimbus-tc001.ax \
-  http://<clock-ip>/api/v1/apps/script/Nimbus
-```
+---
 
-Then open the app settings and set your **latitude** and **longitude** (the default is Paris).
+## 🎛️ Przegląd opcji konfiguracji
 
-### A note on memory (TC001)
+| Grupa | Opcja | Opis |
+| :--- | :--- | :--- |
+| **Wyświetlacz** | `Efekt wycieraczki` | Włącza czyszczenie matrycy czarnym pasem co 5 minut |
+| **Czas** | `Zegar 24-godzinny`, `Zero wiodące`, `Dwukropek`, `Kolor`, `Tarcza` | Wybór formatu czasu, stylu dwukropka oraz tarczy (kartka, pierścień, klapka, duży) |
+| **Kalendarz** | `Nagłówek`, `Tekst`, `Tło`, `Animacja`, `Format daty` | Wygląd i animacja zrywania kartki kalendarza |
+| **Pasek tygodnia**| `Pasek tygodnia`, `Tydzień od poniedziałku`, `Kolory dni` | Pasek z 7 kropkami na dole matrycy wskazujący aktualny dzień tygodnia |
+| **Karuzela** | `Panele`, `Czas daty`, `Czas paneli`, `Przejście` | Wybór wyświetlanych paneli (`date`, `temp`, `weather`, `room`, `humidity`) i animacji przełączania |
+| **Pogoda** | `Lat`, `Lon`, `Odświeżanie`, `Opisy pogody`, `Własne opisy` | Konfiguracja lokalizacji Open-Meteo oraz języka opisów |
+| **Pokój** | `MQTT Topics`, `Kolory` | Odczyt temperatury i wilgotności z własnych tematów MQTT lub wbudowanego czujnika |
+| **Tryb nocny** | `Automatyczny tryb nocny`, `Godziny`, `Jasność nocna` | Wyciszenie rotacji paneli i obniżenie jasności w wyznaczonych godzinach |
 
-Nimbus packs a whole clock face, a weather service, animated icons, eight transitions and a night mode into one script, so it is one of the larger scripts a TC001 can run. To make it fit, the files in `dist/` are minified: 2.0 takes about 29 KB of the 96 KB the TC001 shares between all its scripts, and the file itself is 13 KB. On most clocks that is plenty. If the clock answers **"not enough memory"** when you install, update or open Nimbus's settings:
+---
 
-- **Remove scripts you don't use.** A disabled app still takes its share of memory; deleting it gives it back.
-- **Restart the clock and try again.** Memory gets fragmented over days; a fresh start gives it back in one piece.
-- **Replace Nimbus with scripts switched off:** switch scripting off in the system settings (`scriptingEnabled`), restart, install, switch it back on and restart. The new script then loads on a clean memory.
+## 👤 Autorzy & Podziękowania
 
-The TC002 has memory to spare: none of this applies there.
+- **AkdM** – Autor oryginalnej aplikacji [Nimbus (v2.0)](https://bluebeards.org/awtrix/) w sklepie AWTRIX Hub.
+- **olo81** – Modyfikacja, polska lokalizacja, poprawki parsera oraz wdrożenie efektu wycieraczki (v2.2 PL).
 
-## Settings
+---
 
-| Group | Setting | Default | What it does |
-|---|---|---|---|
-| Time | 24-hour clock | on | Off shows 1–12 |
-| Time | Leading zero | on | Pads the hour to two digits |
-| Time | AM/PM indicator | off | TC001 only. 12-hour clock; shown in night mode, like the official app |
-| Time | Colon | pulse | `steady`, `blink` or `pulse` |
-| Time | Time color | #FFFFFF | On the TC002 also the big face's date |
-| Time | Clock on the right | on | TC001 only. Off mirrors the layout |
-| Time | Clock face | sheet | TC002 only: `sheet`, `ring`, `flap` or `big` |
-| Calendar | Header / Text / Body color | #FF0000 / #000000 / #FFFFFF | |
-| Calendar | Calendar animation | on | TC002 only: the sheet is torn off when Nimbus appears and at midnight |
-| Calendar | Date format | dd.mm.yy | TC002 only, big face: `dd.mm.yy`, `mm/dd/yy` or `yy-mm-dd` |
-| Week bar | Week bar | on | |
-| Week bar | Week starts Monday | on | |
-| Week bar | Today / Other weekdays | #FFFFFF / #666666 | |
-| Week bar | Today on a weekend / Other weekend days | #FFFFFF / #666666 | Weekend = Saturday and Sunday |
-| Carousel | Panels | `date,temp,weather` | Any of `date`, `temp`, `weather`, `room`, `humidity`, in order |
-| Carousel | Date duration / Other panels duration | 10 s / 3 s | |
-| Carousel | Transition | wipe | `wipe`, `fade`, `morph`, `down`, `up`, `left`, `right` or `none` |
-| Weather | Latitude / Longitude | 48.8566 / 2.3522 | |
-| Weather | Refresh | 15 min | A failed fetch is retried every minute |
-| Weather | Condition words | English | TC002 only, big face: English, Español, Français, Português or Deutsch |
-| Weather | Your own words | empty | TC002 only: your words for clear, partly cloudy, cloudy, fog, rain, snow and storm, in that order, separated by commas; an empty one keeps the language's word |
-| Room | Room temperature MQTT topic / Humidity MQTT topic | empty | On the broker set in AWTRIX's MQTT settings; empty uses the clock's sensor |
-| Room | Room temperature color / Humidity color | #FFFFFF / #00AAFF | |
-| Night mode | Night mode | off | Turns night mode on |
-| Night mode | Automatic night mode, From, Until | off, 22 h, 7 h | Night mode between those hours |
-| Night mode | Week bar in night mode | on | |
-| Night mode | Big time at night | off | TC001 only: the time in bold digits across the whole display, without the week bar |
-| Night mode | Pause app rotation in night mode | off | Keeps Nimbus on screen at night; pressing a button or switching apps ends the pause early |
-| Night mode | Night brightness | 0 | 0 keeps the device's brightness; otherwise set at night and restored after (device-wide) |
-| Night mode | Auto brightness at night | off | TC001 only: the light sensor sets the brightness at night, within the clock's own min/max, then your setting comes back; takes over the night brightness |
-| Night mode | MQTT topic | empty | On the broker set in AWTRIX's MQTT settings; payload `on`/`off`, `true`/`false` or `1`/`0` |
+## 📜 Licencja
 
-## On the TC002
-
-Pick the face with **Clock face**. The time and the week bar are the TC002 clock's own; the carousel takes the calendar's place:
-
-- **`sheet`, `ring`, `flap`**: the carousel replaces the sheet. The date panel is the face's sheet, torn off when Nimbus appears and at midnight (**Calendar animation**). Temperatures and humidity are in big digits, the weather icon at double size.
-- **`big`**: the time stays and the bottom row cycles: the weekday and the date (**Date format**), then the temperature, the weather, the room temperature and the humidity, each with a small icon made for it. The weather's word is in English, Spanish, French, Portuguese or German (**Condition words**), or your own: `,,OVERCAST` replaces only "cloudy". A word wider than the space next to the icon bounces.
-
-At night every face shows the big face's time in red, centred on the display, with the week bar on the bottom row (**Week bar in night mode**).
-
-## Room values over MQTT
-
-Nimbus has no MQTT settings of its own: it reads its topics through the clock's connection, so the messages must be published on the broker set in AWTRIX's MQTT settings (host, port, user and password go there). Topics do not have to start with AWTRIX's MQTT prefix.
-
-Set **Room temperature MQTT topic** and/or **Humidity MQTT topic**. Nimbus takes the first number in each message, so `21.5`, `21.5 °C` and `{"temperature": 21.5}` all work, and shows it as received. With Home Assistant, [MQTT Statestream](https://www.home-assistant.io/integrations/mqtt_statestream/) publishes a sensor's state on a topic such as `homeassistant/sensor/salon_temperature/state`, or an automation can call `mqtt.publish` with `retain: true`. A panel without a value is skipped.
-
-## Night mode over MQTT
-
-Set the night mode **MQTT topic**, then publish `on` or `off` on the same broker as AWTRIX's:
-
-```yaml
-action: mqtt.publish
-data:
-  topic: awtrix/nimbus/night
-  payload: "on"
-  retain: true
-```
-
-The last change wins between the **Night mode** setting and MQTT, and the state survives restarts, so `retain` is optional. During the automatic hours, night mode stays on whatever the manual switch says.
-
-> **Tip:** at very low brightness, dim colors can disappear on the LEDs. If your week days vanish at night, pick a lighter color for them.
-
-## Weather icons
-
-| ![Sun](docs/icons/sun.gif) | ![Clear night](docs/icons/night.gif) | ![Partly cloudy](docs/icons/partly.gif) | ![Cloudy](docs/icons/cloudy.gif) |
-|:---:|:---:|:---:|:---:|
-| Clear | Clear night | Partly cloudy | Cloudy |
-| ![Fog](docs/icons/fog.gif) | ![Rain](docs/icons/rain.gif) | ![Snow](docs/icons/snow.gif) | ![Thunderstorm](docs/icons/storm.gif) |
-| Fog | Rain | Snow | Thunderstorm |
-
-The icons live in `src/nimbus.ax` as pixel-art strings (see `init()`): one palette letter per pixel, `.` is off and `/` starts the next row.
-
-## Development
-
-`src/nimbus.ax` is the source: lines between `# @if tc001` (or `tc002`) and `# @end` go only into that clock's file. `python3 build.py` writes the scripts in `dist/`, minified for the clock (short names, no comments or spaces): the clock keeps a script's whole source in memory to install it and to list its settings. Read and edit `src/nimbus.ax`; commit the `dist/` files with it (`python3 build.py --check` fails when they are out of date).
-
-The tests drive two AWTRIX NG simulators, the firmware's own Linux build in containers:
-
-```sh
-sim/sim.sh build                          # once, several minutes
-sim/sim.sh start tc001 && sim/sim.sh start tc002
-sim/sim.sh mqtt tc001 && sim/sim.sh mqtt tc002   # local Mosquitto for the MQTT tests
-python3 -m unittest discover -s tests -v
-```
-
-The TC001 simulator is on http://localhost:8080 and the TC002 one on http://localhost:8081; the TC002 one runs the TC002's own clock app (see `sim/Dockerfile`). `sim/sim.sh deploy tc001` installs the built file. The parity tests compare Nimbus with the official clock pixel for pixel. `python3 tests/screens.py` takes the screenshots.
-
-## Compatibility
-
-Made for the **Ulanzi TC001 (32×8)**, tested on a real one, and for the **Ulanzi TC002 (52×16)**, tested in its simulator. Other 32×8 panels should work with the TC001 file; feedback welcome!
-
-## Changelog
-
-### 2.1 — 2026-10-24
-- TC001: **Big time at night**, the time in bold 6×8 digits across the whole display at night (no week bar, no AM/PM).
-- TC001: **Auto brightness at night**, the light sensor sets the brightness at night, and your own setting comes back in the morning.
-
-### 2.0 — 2026-10-24
-- Rebuilt from scratch: the clock and calendar are now an exact copy of the official Time app, with its settings (12/24 h, leading zero, AM/PM, colon modes, colors, week bar).
-- Carousel with any order of `date`, `temp`, `weather`, `room` and `humidity`.
-- Room temperature and humidity from the clock's sensor or MQTT.
-- Night mode: official plain layout in red, optional week bar, app rotation pause and night brightness.
-- TC002 version: the TC002's clock faces `sheet`, `ring`, `flap` and `big`, with the carousel in the sheet's place or on the big face's bottom row, small icons made for it, the weather's word in five languages or your own, and the big face's time in red at night.
-- New settings: the location, weather refresh, date duration, transition, clock side and night mode hours and topic carry over from 1.x; the others start from their defaults.
-- The files in `dist/` are minified to fit the TC001's memory; `src/nimbus.ax` is the readable source.
-
-### 1.2 — 2026-10-02
-- The degree sign is a solid dot instead of a ring.
-- With the clock on the right, it sits 1 px closer to the panel, centered on the week bar.
-- Night mode: the time moved 1 px left so it looks centered over the week bar.
-- Night mode: the last change wins between the **Night mode** setting and MQTT, and the state survives restarts.
-
-### 1.1 — 2026-10-01
-- New `fade` and `morph` transitions.
-- The panel digits are drawn by Nimbus from a copy of the firmware's font.
-
-### 1.0 — 2026-10-01
-- First release.
-
-## Credits
-
-Weather data by [Open-Meteo.com](https://open-meteo.com/), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Oprogramowanie udostępniane na zasadach open-source, zgodnie z pierwotną licencją projektu Nimbus dla systemu AWTRIX Light / Awtrix NG.
