@@ -4,6 +4,8 @@ Zmodyfikowana i w pełni spolszczona wersja aplikacji **Nimbus** dla zegarów ma
 
 Aplikacja wyświetla zegar (w kilku wariantach tarcz), kalendarz, rozbudowaną pogodę z serwisu **Open-Meteo**, odczyty temperatury oraz wilgotności w pomieszczeniu (z czujników lokalnych lub MQTT), a także oferuje automatyczny tryb nocny i efekty przejść.
 
+> **Grafiki poglądowe:** Zrzuty ekranu przedstawiające działanie aplikacji (tarcze `sheet`, `ring`, `flap`, `big`, tryb nocny oraz poszczególne panele) znajdują się w [oryginalnym repozytorium AkdM](https://github.com/AkdM/awtrix-ng-nimbus-clock-weather). W forku polskim wygląd paneli jest zgodny z poniższym opisem.
+
 ---
 
 ## Co nowego w tym forku (w stosunku do oryginału)
@@ -14,6 +16,7 @@ Aplikacja wyświetla zegar (w kilku wariantach tarcz), kalendarz, rozbudowaną p
 
 ### 2. Rozszerzona obsługa pogody (10 stanów z Open-Meteo)
 Rozbudowano parser i silnik renderowania ikonek z 7 do **10 dokładnych stanów pogodowych WMO**:
+
 1. **Słonecznie** (`CLEAR`)
 2. **Zachmurzenie** (`PARTLY`)
 3. **Chmury** (`CLOUDY`)
@@ -79,6 +82,7 @@ Dodano dedykowane polskie opisy oraz dopasowane animacje pikselowe dla mżawki, 
 ## 🌐 Źródła danych
 
 - **Pogoda i PM2.5:** [Open-Meteo](https://open-meteo.com/) – darmowe API, bez klucza, z limitem 10 000 zapytań dziennie. Dane pogodowe pochodzą z modeli numerycznych (m.in. ECMWF, ICON), a jakość powietrza z modelu CAMS (Copernicus Atmosphere Monitoring Service).
+- **Grafiki i oryginalny kod:** [AkdM/awtrix-ng-nimbus-clock-weather](https://github.com/AkdM/awtrix-ng-nimbus-clock-weather) – repozytorium autora oryginalnej aplikacji Nimbus.
 
 ---
 
