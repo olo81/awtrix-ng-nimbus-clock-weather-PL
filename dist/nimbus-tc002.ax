@@ -1,8 +1,8 @@
 # @hub aCQWh4FpWLwK 4410930662c50393922093fa3ecc7adeb28f7d014c755028b7aa4cf066b660b4
 # @name Nimbus
-# @desc Zegar z kalendarzem, pogodą i odczytami z pomieszczenia
-# @author AkdM
-# @version 2.2
+# @desc Zegar z kalendarzem, pogodą, jakością powietrza PM i odczytami z pomieszczenia
+# @author AkdM / olo81
+# @version 2.3.2
 # @display 52x16
 # @config sweep bool "Efekt wycieraczki (co 5 min)" default=true group="Wyświetlacz" help="Czarny pas czyszczący matrycę przechodzi z prawej do lewej co 5 minut"
 # @config t24 bool "Zegar 24-godzinny" default=true group="Czas"
@@ -21,15 +21,16 @@
 # @config wod color "Pozostałe dni robocze" default=#666666 group="Pasek tygodnia"
 # @config wtw color "Dzisiaj w weekend" default=#FFFFFF group="Pasek tygodnia"
 # @config wow color "Pozostałe dni weekendowe" default=#666666 group="Pasek tygodnia"
-# @config panels text "Panele" default="date,temp,weather" group="Karuzela" help="Po kolei, rozdzielone przecinkami: date, temp, weather, room, humidity"
+# @config panels text "Panele" default="date,temp,weather,pm25" group="Karuzela" help="Po kolei, rozdzielone przecinkami: date, temp, weather, room, humidity, pm25"
 # @config ddur slider "Czas wyświetlania daty" default=10 min=1 max=60 unit=s group="Karuzela"
 # @config pdur slider "Czas pozostałych paneli" default=3 min=1 max=60 unit=s group="Karuzela"
 # @config tran select "Przejście" options=przetarcie,zanikanie,przejście,dół,góra,lewo,prawo,brak default=przetarcie group="Karuzela"
-# @config lat number "Szerokość geogr. (Lat)" default=48.8566 min=-90 max=90 step=0.0001 group="Pogoda"
-# @config lon number "Długość geogr. (Lon)" default=2.3522 min=-180 max=180 step=0.0001 group="Pogoda"
-# @config wref number "Odświeżanie" default=15 min=5 max=120 unit=min group="Pogoda"
-# @config wlang select "Opisy pogody" options=Polski,English,Español,Français,Português,Deutsch default=Polski group="Pogoda" help="Dla dużej tarczy"
-# @config wtext text "Własne opisy" default="" group="Pogoda" help="Duża tarcza. W kolejności: słonecznie, zachmurzenie, chmury, mgła, mżawka, deszcz, ulewa, śnieg, śnieżyca, burza"
+# @config showpm bool "Pokaż PM2.5" default=true group="Pogoda i Powietrze" help="Wyłącza panel PM2.5 z karuzeli"
+# @config lat number "Szerokość geogr. (Lat)" default=48.8566 min=-90 max=90 step=0.0001 group="Pogoda i Powietrze"
+# @config lon number "Długość geogr. (Lon)" default=2.3522 min=-180 max=180 step=0.0001 group="Pogoda i Powietrze"
+# @config wref number "Odświeżanie" default=15 min=5 max=120 unit=min group="Pogoda i Powietrze"
+# @config wlang select "Opisy pogody" options=Polski,English,Español,Français,Português,Deutsch default=Polski group="Pogoda i Powietrze" help="Dla dużej tarczy"
+# @config wtext text "Własne opisy" default="" group="Pogoda i Powietrze" help="Duża tarcza. W kolejności: słonecznie, zachmurzenie, chmury, mgła, mżawka, deszcz, ulewa, śnieg, śnieżyca, burza"
 # @config rtopic text "MQTT: Temperatura w pokoju" default="" group="Pokój" help="Na brokerze z ustawień AWTRIX. Puste używa czujnika zegara"
 # @config htopic text "MQTT: Wilgotność" default="" group="Pokój" help="Na brokerze z ustawień AWTRIX. Puste używa czujnika zegara"
 # @config rcol color "Kolor temperatury w pokoju" default=#FFFFFF group="Pokój"
@@ -43,24 +44,25 @@
 # @config nbri number "Jasność nocna" default=0 min=0 max=255 group="Tryb nocny" help="0 zachowuje jasność urządzenia; inna wartość ustawi jasność na noc"
 # @config ntopic text "MQTT Topic trybu nocnego" default="" group="Tryb nocny" help="Payload: on/off, true/false lub 1/0"
 import math import string class Nimbus var asw,aswt,au,av,bg,T,n,F,aw,U,w,ax,ay,az,aA,aB var aC,aD,aE,aF,aG,aH,aI,aJ,aK,aL,V var e,W,X,Y,Z var a,f,G,H,I,aa,aM,ab,ac var ad,aN,aO,aP,aQ,aR,aS,aT,J,ae,af,K,ag,ah
-var ai,aU,aV,aW,aj,aX,x,ak var al var o var c,L,d,y,M,N var i,t,aY,z,u,am,j,an,O,aZ,A,P,ao var a0,a1,a2,a3,B,Q,p var q,C,ba,ap,k,D,R var r,aq,ar def init()self.asw=store.get("sweep",true)self.aswt=0 self.au=store.get("t24")self.av=store.get(
+var ai,aU,aV,aW,aj,aX,x,ak var al var o var c,L,d,y,M,N var i,t,aY,z,u,am,j,an,O,aZ,A,P,ao var a0,a1,a2,a3,B,Q,p,pm1,pm2,pmQ var q,C,ba,ap,k,D,R var r,aq,ar def init()self.asw=store.get("sweep",true)self.aswt=0 self.au=store.get("t24")self.av=store.get(
 "tlz")self.T=["stały","mrugający","pulsowanie"].find(store.get("tsep"))if self.T==nil self.T=["steady","blink","pulse"].find(store.get("tsep"))end self.n=store.get("tcol")self.F=store.get("chc")self.aw=store.get("ctc")self.U=store.get("cbc")self.w=store.get("wbar")self.ax=store.get(
 "wmon")self.ay=store.get("wtd")self.az=store.get("wod")self.aA=store.get("wtw")self.aB=store.get("wow")self.aC=["przetarcie","zanikanie","przejście","dół","góra","lewo","prawo","brak"].find(store.get("tran"))if self.aC==nil self.aC=["wipe","fade","morph","down","up","left","right","none"].find(store.get("tran"))end self.aD=
 store.get("ddur")self.aE=store.get("pdur")self.aF=store.get("rcol")self.aG=store.get("hcol")self.aH=store.get("nauto")self.aI=store.get("nfrom")self.aJ=store.get("nto")self.aK=store.get("nbar")self.aL
 =store.get("npause")self.V=store.get("nbri")self.e=["kartka","pierścień","klapka","duży"].find(store.get("face"))if self.e==nil self.e=["sheet","ring","flap","big"].find(store.get("face"))end self.W=store.get("canim")self.X=["dd.mm.yy","mm/dd/yy","yy-mm-dd"].find(store.get("dfmt"))self.Y
-=self.b(self.n,0.18)self.Z=self.b(self.n,0.28)self.al=[0,0,0,0,0]self.ad=-1 self.c=[]for t:re.matchall("[a-z]+",string.tolower(store.get("panels")))var a=["date","temp","weather","room","humidity"].
-find(t)if a!=nil self.c.push(a)end end if size(self.c)==0 self.c.push(0)end self.L=-1 self.d=-1 self.M=0 self.i=[nil,nil,nil,nil,nil]self.t=[nil,nil,nil,nil,nil]self.aY=[0,0,0,0,0]self.z=[0,0,0,0,0]
-self.u=[0,0,0,0,0]self.am=[nil,nil,nil,nil,nil]self.j=true self.an=0 self.ao={"mode":"bounce","speed":40}self.a0=self.c.find(1)!=nil||self.c.find(2)!=nil self.a1=
-"http://api.open-meteo.com/v1/forecast?latitude="+str(store.get("lat"))+"&longitude="+str(store.get("lon"))+"&current=temperature_2m,weather_code,is_day"self.a2={"find":'"current":{','keep':200}self
-.a3=store.get("wref")*60 self.B=0 self.Q=false var d=store.get("rtopic")self.A=size(d)==0 if!self.A&&self.c.find(3)!=nil mqtt.subscribe(d,/l,f->self.at(3,f))end d=store.get("htopic")self.P=size(d)==0
+=self.b(self.n,0.18)self.Z=self.b(self.n,0.28)self.al=[0,0,0,0,0,0]self.ad=-1 self.c=[]var pmOn=store.get("showpm",true)for t:re.matchall("[a-z0-9]+",string.tolower(store.get("panels")))var a=["date","temp","weather","room","humidity","pm25"].
+find(t)if a!=nil if a!=5||pmOn self.c.push(a)end end end if size(self.c)==0 self.c.push(0)end self.L=-1 self.d=-1 self.M=0 self.i=[nil,nil,nil,nil,nil,nil]self.t=[nil,nil,nil,nil,nil,nil]self.aY=[0,0,0,0,0,0]self.z=[0,0,0,0,0,0]
+self.u=[0,0,0,0,0,0]self.am=[nil,nil,nil,nil,nil,nil]self.j=true self.an=0 self.ao={"mode":"bounce","speed":40}self.a0=self.c.find(1)!=nil||self.c.find(2)!=nil||self.c.find(5)!=nil self.a1=
+"http://api.open-meteo.com/v1/forecast?latitude="+str(store.get("lat"))+"&longitude="+str(store.get("lon"))+"&current=temperature_2m,weather_code,is_day"self.pm1=
+"http://air-quality-api.open-meteo.com/v1/air-quality?latitude="+str(store.get("lat"))+"&longitude="+str(store.get("lon"))+"&current=pm2_5"self.a2={"find":'"current":{','keep':200}self.pm2={"find":'"current":{','keep':200}self
+.a3=store.get("wref")*60 self.B=0 self.Q=false self.pmQ=false var d=store.get("rtopic")self.A=size(d)==0 if!self.A&&self.c.find(3)!=nil mqtt.subscribe(d,/l,f->self.at(3,f))end d=store.get("htopic")self.P=size(d)==0
 if!self.P&&self.c.find(4)!=nil mqtt.subscribe(d,/l,f->self.at(4,f))end self.aZ=(self.A&&self.c.find(3)!=nil)||(self.P&&self.c.find(4)!=nil)self.q=[0xFFC800,0xFF7800,0xFFFFFF,0xB4B4B4,0x6E6E6E,0x3C3C3C
 ,0xF0DC8C,0,0,0]var m="YOWLGDMrS#"var u="0123456789-?%"var g=["...rr/.r....r/..OYYO/r.YYYY.r/r.YYYY.r/..OYYO/.r....r/...rr","..MM/.MM...S/MMM/MMM/MMM/MMMM/.MMMMMM/..MMM",
 "...Y..Y/.Y..OYO/...OYYYO/..LLYYYY/.LWWLLYO/LWWWWWL/WWWWWWWL/GLLLLLG","....GG/..GGGGG/.LLGGGGG/LWWLGGGG/WWWWLGGG/WWWWWWL/GLLLLLG","/.LLLLLL//GGGG.GGG//.LLLLLL//GG.GGGG",
-"/LLLLLL//.GGGG.GG//..LLLLLL//.GG.GGGG","...LL/.LLWWL/LLWWWWL/LWWWWWWL/GLLLLLLG","...GG/.GGLLGG/GLLLLLLG/DGGGGGGD",".....YY/....YY/...YYYY/....YY/...YY","###/#.#/#.#/#.#/###",".#/##/.#/.#/###",
+"/LLLLLL//.GGGG.GG//..LLLLLL//GG.GG","...LL/.LLWWL/LLWWWWL/LWWWWWWL/GLLLLLLG","...GG/.GGLLGG/GLLLLLLG/DGGGGGGD",".....YY/....YY/...YYYY/....YY/...YY","###/#.#/#.#/#.#/###",".#/##/.#/.#/###",
 "###/..#/###/#/###","###/..#/###/..#/###","#.#/#.#/###/..#/..#","###/#/###/..#/###","###/#/###/#.#/###","###/..#/..#/..#/..#","###/#.#/###/#.#/###","###/#.#/###/..#/###","//###","###/..#/.#//.#",
 "#.#/..#/.#/#/#.#"]self.q.push(0x2890FF)self.q.push(0xFF3030)m+="BR"g=g+["r.r.r/.YYY/rYYYr/.YYY/r.r.r",".MMM/MM..S/MM/MM/.MMM","....YYY/..LLYYY/.LWWLY/LWWWWL/.LLLL",
 "..LLL/.LWWWL/LWWWWWL/LWWWWWL/.LLLLL","LLLLLL//.GGGGGG//LLLLLL",".LLL/LWWWL/LLLLL/B.B.B/.B.B",".LLL/LWWWL/LLLLL/W.W.W/.W.W",".GGGG/GDDDDG/GGYYG/..Y/.Y",".L/.L/.R/RRR/RRR","..O/.OOO/OOOOO/.WWW/.W.W",
-"..B/.BBB/BWBBB/BBBBB/.BBB"]self.C=[]self.ba={}var a=0 while a<size(g)var n=g[a]var h=bytes()var j=0 var o=0 var k=0 while k<size(n)var p=n[k]if p=="/"o+=1 j=0 else var q=string.find(m,p)if q>=0 h.add(
+"..B/.BBB/BWBBB/BBBBB/.BBB",".MMM/MMMMM/M.S.M/M.S.M/MMMMM"]self.C=[]self.ba={}var a=0 while a<size(g)var n=g[a]var h=bytes()var j=0 var o=0 var k=0 while k<size(n)var p=n[k]if p=="/"o+=1 j=0 else var q=string.find(m,p)if q>=0 h.add(
 j,1)h.add(o,1)h.add(q,1)end j+=1 end k+=1 end if a<9||a>=22 self.C.push(h)end a+=1 end self.ap=bytes("010004010602010003020601")self.R=bytes()var e=224 a=0 while a<256 e=(e*75+74)%65537 self.R.add(e%
 100,1)a+=1 end while a<832 e=(e*75+74)%65537 self.R.add(e%100,1)a+=1 end self.a={}a=0 while a<13 self.a[u[a]]=self.v(g[9+a])a+=1 end var v=["##/#.#/###/#.#/#.#","##/#.#/##/#.#/##",".#/#.#/#/#.#/.#",
 "##/#.#/#.#/#.#/##","###/#/###/#/###","###/#/###/#/#",".##/#/#.#/#.#/.##","#.#/#.#/###/#.#/#.#","#/#/#/#/#","..#/..#/..#/#.#/.#","#.#/#.#/##/#.#/#.#","#/#/#/#/###","#...#/##.##/#.#.#/#...#/#...#",
@@ -76,17 +78,17 @@ a["."]=self.v("////#")self.a["/"]=self.v("..#/..#/.#/#/#")var w=["#####/#...#/#.
 ..]end while size(b)>0&&b[size(b)-1]==" "b=b[0 ..size(b)-2]end if size(b)>0 c[a]=b end a+=1 end self.ab=[c[0],c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7],c[8],c[9]]self.ac=[]for x:self.ab self.ac.push(51-text_ink_width(
 x))end var i=store.get("night")if i!=store.get("nset")store.set("nset",i)store.set("nstate",i)end self.aq=store.get("nstate",i)self.ar=true d=store.get("ntopic")if size(d)>0 mqtt.subscribe(d,/l,f->
 self.at(0,f))end end def loop()self.M-=1 if self.M<=0 var m=size(self.c)var f=self.L var h=1 while h<=m f=(self.L+h)%m var i=self.c[f]if(i!=3&&i!=4)||self.t[i]!=nil break end h+=1 end var a=self.c[f]
-if(a==3||a==4)&&self.t[a]==nil a=0 end self.L=f if a!=self.d if self.d>=0 self.N=now_ms()end self.y=self.d self.d=a end self.M=a==0?self.aD:self.aE end self.B-=1 if self.a0&&self.B<=0&&!self.Q self.Q=
-true self.B=60 http.get(self.a1,/o,c->self.bb(o,c),self.a2)end self.an+=1 if self.aZ&&self.an%10==1 if self.A var b=sensor.temperature()if b!=self.i[3]self.i[3]=b self.j=true end end if self.P var b=
-sensor.humidity()if b!=self.i[4]self.i[4]=b self.j=true end end end var n=settings.get("useCelsius")if n!=self.O self.O=n self.j=true end if self.j self.j=false var a=1 while a<5 if a!=2 var b=self.i[
-a]var c=nil var j=a==3?self.aF:self.aG if a==1 if b==nil c="--"j=0x666666 else var d=clamp(round(b),10,30)j=hsv(d<20?200-(d-10)*17:30-(d-20)*3,100,100)if!self.O b=b*1.8+32 end end elif b!=nil&&a==3&&
-self.A&&!self.O b=b*1.8+32 end if b!=nil c=str(round(b))+(a==4?"%":"")end self.t[a]=c if c!=nil self.bc(a,c)self.u[a]=j self.am[a]=a==4?c:c+"°"end end a+=1 end end var e=hour()var k=self.aI var d=self
+if(a==3||a==4)&&self.t[a]==nil a=0 end self.L=f if a!=self.d if self.d>=0 self.N=now_ms()end self.y=self.d self.d=a end self.M=a==0?self.aD:self.aE end self.B-=1 if self.a0&&self.B<=0&&!self.Q&&!self.pmQ self.Q=
+true self.pmQ=true self.B=60 http.get(self.a1,/o,c->self.bb(o,c),self.a2)http.get(self.pm1,/o,c->self.pmb(o,c),self.pm2)end self.an+=1 if self.aZ&&self.an%10==1 if self.A var b=sensor.temperature()if b!=self.i[3]self.i[3]=b self.j=true end end if self.P var b=
+sensor.humidity()if b!=self.i[4]self.i[4]=b self.j=true end end end var n=settings.get("useCelsius")if n!=self.O self.O=n self.j=true end if self.j self.j=false var a=1 while a<6 if a!=2 var b=self.i[
+a]var c=nil var j=a==3?self.aF:(a==4?self.aG:0xFFFFFF)if a==1 if b==nil c="--"j=0x666666 else var d=clamp(round(b),10,30)j=hsv(d<20?200-(d-10)*17:30-(d-20)*3,100,100)if!self.O b=b*1.8+32 end end elif a==5 if b==nil c="--"j=0x666666 else var pmv=round(b)j=pmv<=12?0x00FF00:(pmv<=35?0xFFFF00:(pmv<=55?0xFF7800:0xFF0000))end elif b!=nil&&a==3&&
+self.A&&!self.O b=b*1.8+32 end if b!=nil&&a!=5 c=str(round(b))+(a==4?"%":"")elif b!=nil&&a==5 c=str(round(b))end self.t[a]=c if c!=nil self.bc(a,c)self.u[a]=j self.am[a]=a==4?c:(a==5?c:c+"°")end end a+=1 end end var e=hour()var k=self.aI var d=self
 .aJ var g=self.aq||self.aH&&e>=0&&(k>d?e>=k||e<d:e>=k&&e<d)if g!=self.r self.r=g if g&&self.aL rotation.show()rotation.pause()store.set("npz",true)elif store.get("npz",false)rotation.resume()store.set(
 "npz",false)end if g if self.V>0 if!store.get("nbsave",false)store.set("nbsave",[settings.get("autoBrightness"),settings.get("brightness")])end settings.set("autoBrightness",false)settings.set(
 "brightness",self.V)end else var l=store.get("nbsave",false)if l settings.set("autoBrightness",l[0])settings.set("brightness",l[1])store.set("nbsave",false)end end end end def bb(c,g)self.Q=false if g
 !=200||c==nil return end var d=re.search('temperature_2m":([-0-9.]+)',c)var e=re.search('weather_code":([0-9]+)',c)var f=re.search('is_day":([0-9])',c)if d==nil||e==nil return end var b=int(e[1])
-var a=0 if b>=95 a=10 elif b==85||b==86||b==75 a=9 elif b>=71 a=8 elif b>=80||b==65||b==67 a=7 elif b>=61 a=6 elif b>=51 a=5 elif b>=45 a=4 elif b==3 a=3 elif f!=nil&&f[1]=="0"a=1 elif b>0 a=2 end self.p=a self.i[1]=num(d[1])self.B=self.a3 self
-.j=true end def at(b,c)if b==0 var a=string.tolower(str(c))a=a=="on"||a=="true"||a=="1"var e=self.ar self.ar=false if e&&a==store.get("nmqtt")return end store.set("nmqtt",a)store.set("nstate",a)self.
+var a=0 if b>=95 a=10 elif b==85||b==86||b==75 a=9 elif b>=71 a=8 elif b>=80||b==65||b==67 a=7 elif b>=61 a=6 elif b>=51 a=5 elif b==45 a=4 elif b==3 a=3 elif f!=nil&&f[1]=="0"a=1 elif b>0 a=2 end self.p=a self.i[1]=num(d[1])self.B=self.a3 self
+.j=true end def pmb(c,g)self.pmQ=false if g!=200||c==nil return end var d=re.search('pm2_5":([-0-9.]+)',c)if d==nil return end self.i[5]=num(d[1])self.j=true end def at(b,c)if b==0 var a=string.tolower(str(c))a=a=="on"||a=="true"||a=="1"var e=self.ar self.ar=false if e&&a==store.get("nmqtt")return end store.set("nmqtt",a)store.set("nstate",a)self.
 aq=a else var d=re.search("-?[0-9]+[.]?[0-9]*",str(c))if d!=nil self.i[b]=num(d[0])self.j=true end end end def b(a,b)return rgb(int(((a>>16)&255)*b+0.5),int(((a>>8)&255)*b+0.5),int((a&255)*b+0.5))end
 def bd(c,d,e,f,g)var a=d while a<d+f var b=c while b<c+e if b>=0&&b<52&&a>=0&&a<16&&(self.R[a*52+b]<self.k)==self.D pixel(b,a,g)end b+=1 end a+=1 end end def on_show()if self.W&&self.e<3&&self.d==0&&!
 self.r var a=settings.get("transitionDurationMs")self.x=now_ms()+(a==nil?0:a)end end def v(f)var c=bytes("00")var e=0 for d:string.split(f,"/")var a=0 while a<size(d)if d[a]=="#"var b=1 while a+b<size(
@@ -104,17 +106,15 @@ var c=0 while c<size(f)var a=i[f[c]]var b=1 while b<size(a)var d=0 while d<a[b+2
 var b=0 while b<16 var a=0 while a<15 var c=0 if b>=(g?1:0)c=b<i?self.F:self.U end if g&&b<3&&(a==3||a==4||a==10||a==11)c=b<2?0x9A9A9A:0 end d.push(c)a+=1 end b+=1 end if!g var e=self.e==2||!self.w?
 self.aa[k*3 ..k*3+2]:self.aM[j*3-3 ..j*3-1]self.a6(d,(15-self.E(e,self.a))/2,1,e,self.a,self.U)end var e=str(m)self.a6(d,(15-self.E(e,self.f))/2,i+(9-i)/2,e,self.f,self.aw)var l=[]b=0 while b<16 var h
 =[]var a=0 while a<15 var c=d[b*15+a]var f=1 while a+f<15&&d[b*15+a+f]==c f+=1 end h.push(a)h.push(f)h.push(c)a+=f end l.push(h)b+=1 end return l end def a8(b,d,e,c)var a=0 while a<size(b)self.s(d+b[a
-],e,b[a+1],1,c<1?self.b(b[a+2],c):b[a+2])a+=3 end end def bc(a,c)var e=a==4?c[0 ..size(c)-2]:c var f=a==4?4:3 var b=self.E(e,self.a)+f var d=1 if self.e==3 self.z[a]=51-b else var g=self.E(e,self.f)+f
+],e,b[a+1],1,c<1?self.b(b[a+2],c):b[a+2])a+=3 end end def bc(a,c)var e=(a==4||a==5)?c:c var f=a==4?4:3 var b=self.E(e,self.a)+f var d=1 if self.e==3 self.z[a]=51-b else var g=self.E(e,self.f)+f
 if g<=16 d=0 b=g elif b>16 d=2 end self.z[a]=(16-b)/2 end self.al[a]=d self.aY[a]=b end def be(i,j,f)var g=now_ms()var a=self.p var c=self.C[a<4?a:(a==4?4+(g/700)%2:(a==10?7:6))]var h=0 while c!=nil
 var b=0 while b<size(c)var d=self.q[c[b+2]]self.s(i+2*c[b],j+2*(h+c[b+1]),2,2,f<1?self.b(d,f):d)b+=3 end var e=g%1870 if a==10&&h==0&&(e<90||(e>=180&&e<270))c=self.C[8]h=3 else c=nil end end if a>=5&&a<=9 var k=(a==8||a==9)?6:0 var sp=(a==5||a==8)?300:(a==7||a==9?110:180)var e=g/sp var d=a==5?0x64B5F6:(a==7?0x0055FF:(a==9?0xE0F7FA:(a==8?0xFFFFFF:0x2890FF)))if f<1 d=self.b(d,f)end var b=0 while b<6 self.s(i+2*self.ap[k+b],j+2*(5+(e+self.ap[k+b+1])%3),2,2,d)b+=2 end end end def a9(e,f,g,c)var b=self.C[9+e]var a=0 while a<size(b)var d=self.q[b[a+2]]self.s(f+b[a],g+b[a+1],1,1,c<1?self.b(d,c):d)a+=3 end end def bf(b,c,h,a)var d=h+11 if b==0 self.l(c+1,d,self.aW,self.a,a<1?self.b(self.F
 ,a):self.F)self.l(c+self.aX,d,self.aj,self.a,a<1?self.b(self.n,a):self.n)elif b==2 if self.p==nil self.l(c+48,d,"?",self.a,a<1?self.b(0x666666,a):0x666666)else var im=[0,1,2,3,4,5,5,7,6,6,7]self.a9(im[self.p],c+1,d,a)if self.k==nil||(
-self.k>=50)==self.D var i=self.ab[self.p]var e=a<1?self.b(0xFFFFFF,a):0xFFFFFF var f=self.ac[self.p]if f<9 scroll_text(c+9,h+16,42,i,e,self.ao)else text(c+f,h+16,i,e)end end end else var g=self.t[b]if
-g==nil return end var e=a<1?self.b(self.u[b],a):self.u[b]self.a9(b==1?8:(b==3?9:10),c+1,d,a)var f=self.l(c+self.z[b],d,b==4?g[0 ..size(g)-2]:g,self.a,e)if b==4 self.l(f,d,"%",self.a,e)else self.s(f,d,
-2,2,e)end end end def m(b,d,e,c)if b<0 return end if self.e==3 return self.bf(b,d,e,c)end if b==0 var k=self.aU var a=0 while a<16 self.a8(k[a],d,e+a,c)a+=1 end if self.x!=nil var f=now_ms()-self.x if
+self.k>=50)==self.D var i=self.ab[self.p]var e=a<1?self.b(0xFFFFFF,a):0xFFFFFF var f=self.ac[self.p]if f<9 scroll_text(c+9,h+16,42,i,e,self.ao)else text(c+f,h+16,i,e)end end end elif b==5 var g=self.t[5]if g==nil return end var ucol=a<1?self.b(self.u[5],a):self.u[5]rect_fill(c+1,h+1,50,14,ucol)var plw=self.E("PM",self.a)var plx=c+(52-plw)/2 self.l(plx,h+1,"PM",self.a,a<1?self.b(0x000000,a):0x000000)var wval=self.E(g,self.a)var xval=c+(52-wval)/2 self.l(xval,h+8,g,self.a,a<1?self.b(0x000000,a):0x000000)else var g=self.t[b]if
+g==nil return end var e=a<1?self.b(self.u[b],a):self.u[b]self.a9(b==1?8:(b==3?9:10),c+1,d,a)var f=self.l(c+self.z[b],d,g,self.a,e)if b==4 self.l(f,d,"%",self.a,e)else self.s(f,d,2,2,e)end end end def m(b,d,e,c)if b<0 return end if self.e==3 return self.bf(b,d,e,c)end if b==0 var k=self.aU var a=0 while a<16 self.a8(k[a],d,e+a,c)a+=1 end if self.x!=nil var f=now_ms()-self.x if
 f>=1100 self.x=nil else if f<0 f=0 end var g=f/1100.0 var l=int(17*g*g+0.5)var n=int(3*g*g+0.5)k=self.aV a=15 while a>=(self.e==1?3:0)if a+l<=15 self.a8(k[a],d+(a+l>8?n:0),e+a+l,c)end a-=1 end end end
-elif b==2 if self.p==nil self.l(d+6,e+5,"?",self.a,c<1?self.b(0x666666,c):0x666666)else self.be(d,e,c)end else var h=self.t[b]if h==nil return end var i=c<1?self.b(self.u[b],c):self.u[b]var j=self.al[
-b]if j==2 if self.k==nil||(self.k>=50)==self.D scroll_text(d,e+10,16,self.am[b],i,self.ao)end return end var a=e+(j==0?4:5)var m=self.l(self.z[b]+d,a,b==4?h[0 ..size(h)-2]:h,j==0?self.f:self.a,i)if b
-==4 self.l(m,a+(j==0?2:0),"%",self.a,i)else self.s(m,a,2,2,i)end end end def draw()var l=now_ms()if minute()<0 clear()var a=self.r?4:self.e var b=self.r?0xFF0000:self.n if self.o==nil||self.o[0]!=a if
+elif b==2 if self.p==nil self.l(d+6,e+5,"?",self.a,c<1?self.b(0x666666,c):0x666666)else self.be(d,e,c)end elif b==5 var h=self.t[5]if h==nil return end var ucol=c<1?self.b(self.u[5],c):self.u[5]rect_fill(d,e,15,16,ucol)var plw=self.E("PM",self.a)var plx=d+(15-plw)/2 self.l(plx,e+2,"PM",self.a,c<1?self.b(0x000000,c):0x000000)var wv=self.E(h,self.a)var x2=d+(15-wv)/2 if x2<d x2=d end self.l(x2,e+9,h,self.a,c<1?self.b(0x000000,c):0x000000)else var h=self.t[b]if h==nil return end var i=c<1?self.b(self.u[b],c):self.u[b]var j=self.al[
+b]if j==2 if self.k==nil||(self.k>=50)==self.D scroll_text(d,e+10,16,self.am[b],i,self.ao)end return end var a=e+(j==0?4:5)var m=self.l(self.z[b]+d,a,h,j==0?self.f:self.a,i)if b==4 self.l(m,a+(j==0?2:0),"%",self.a,i)else self.s(m,a,2,2,i)end end end def draw()var l=now_ms()if minute()<0 clear()var a=self.r?4:self.e var b=self.r?0xFF0000:self.n if self.o==nil||self.o[0]!=a if
 a==2 self.o=[a,[self.g("--",self.a,self.I,2,2,17,16,3)[0],self.g("--",self.a,self.I,2,2,36,16,3)[0]]]else self.o=[a,a>=3?self.g("--:--",self.f,self.H,2,1,0,52,a==4?3:0):self.g("--:--",self.a,self.G,2,
 2,17,34,self.w?2:3)]end end if a==2 self.J=self.o[1]self.K=[false,false]self.a5(b,b)else self.h(self.o[1][0],b)self.h(self.o[1][1],b)end return end if minute()!=self.ad var m=hour()var v=minute()self.
 ad=v if!self.au m=m%12 if m==0 m=12 end end var e=(self.av&&m<10?"0":"")+str(m)+":"+(v<10?"0":"")+str(v)var w=self.ak!=nil&&l-self.ak<1000?self.aN:e self.aN=e var f=self.g(e,self.f,self.H,2,1,0,52,0)
