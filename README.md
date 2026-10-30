@@ -1,6 +1,5 @@
 # Nimbus Clock Weather – Polska Wersja (AWTRIX Light / Awtrix NG)
 
-docs/icons/NimbusPL.gif
 
 Zmodyfikowana i w pełni spolszczona wersja aplikacji **Nimbus** dla zegarów małych matryc LED sterowanych systemem **AWTRIX Light / Awtrix NG**.
 
