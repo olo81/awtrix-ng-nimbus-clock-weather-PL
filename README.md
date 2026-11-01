@@ -1,16 +1,35 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-[![Version](https://img.shields.io/badge/version-2.6.0%20PL-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-2.7.0%20PL-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
-  <img src="docs/NimbusPL.gif" alt="NimbusPL Demo" width="450">
+
+| Karuzela paneli | Meteoalarm (IMGW) | Faza księżyca |
+| :---: | :---: | :---: |
+| <img src="docs/demo-carousel.gif" width="250" alt="Karuzela: data, temperatura, pogoda, PM2.5, faza księżyca"> | <img src="docs/meteoalarm.gif" width="250" alt="Ostrzeżenia meteoalarm (IMGW)"> | <img src="docs/moon.gif" width="250" alt="Faza księżyca na karuzeli"> |
+
 </p>
 
 **NimbusPL** to rozbudowany, w pełni spolszczony fork popularnej aplikacji **Nimbus** przeznaczony dla zegarów z małą matrycą LED (52x16) sterowanych oprogramowaniem **AWTRIX Light** lub **Awtrix NG** (np. Ulanzi TC001 / TC002).
 
 Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z Open-Meteo, stężenia pyłów **PM2.5**, odczytów temperatury i wilgotności w pomieszczeniu, ostrzeżeń **Meteoalarm** (IMGW) oraz serii efektów wizualnych (m.in. efekt wycieraczki chroniący matrycę przed powidokami).
+
+---
+
+## 🆕 Nowości w v2.7.0 PL
+
+### 🌙 Faza księżyca na karuzeli
+
+- Nowy panel karuzeli **`moon`** — **ikonka księżyca na czarnym tle** z aktualną fazą, wyliczaną z daty (pełny cykl synodyczny 29,53 dnia).
+- Terminator rysowany **w sposób ciągły** (nie tylko 8 faz) — sierp, kwadry, garby i pełnia wyglądają jak na prawdziwym niebie; ciemna część tarczy jest obrysowana na szaro, więc widać też **nów**.
+- Na dużej tarczy panel pokazuje małą ikonkę fazy + nazwę fazy (`NÓW`, `SIERP`, `I KWADRA`, `GARB`, `PEŁNIA`, `III KWADRA`).
+- **Opcja włącz/wyłącz `Faza księżyca`** (grupa *Karuzela*, domyślnie włączona) — panel sam dołącza się do rotacji, tak jak meteoalarm.
+
+<p align="center">
+  <img src="docs/moon.gif" alt="Faza księżyca" width="250">
+</p>
 
 ---
 
@@ -185,7 +204,7 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 W sekcji **Karuzela** w polu **Panele** możesz ustalić kolejność wyświetlanych widoków (rozdzielając nazwy przecinkami):
 
 ```text
-date, temp, weather, room, humidity, pm25, meteoalarm
+date, temp, weather, room, humidity, pm25, meteoalarm, moon
 ```
 
 | Nazwa panela | Opis widoku |
@@ -197,6 +216,7 @@ date, temp, weather, room, humidity, pm25, meteoalarm
 | `room` | Temperatura w pokoju (czujnik lokalny lub MQTT) |
 | `humidity` | Wilgotność w pokoju (czujnik lokalny lub MQTT) |
 | `meteoalarm` | Ostrzeżenia Meteoalarm/IMGW (kafelek `METEOALARM` lub panel `ALARM`) |
+| `moon` | Aktualna faza księżyca — ikonka na czarnym tle |
 
 > 💡 Panel `meteoalarm` jest automatycznie pokazywany **poza rotacją** — tylko w momencie, gdy obowiązuje komunikat ostrzeżenia (częstotliwość ustawisz w opcjach).
 
@@ -217,9 +237,10 @@ date, temp, weather, room, humidity, pm25, meteoalarm
 | | `Format daty` | `dd.mm.yy` | Format daty na dużej tarczy (`dd.mm.yy`, `mm/dd/yy`, `yy-mm-dd`) |
 | **Pasek tygodnia** | `Pasek tygodnia` | `tak` | Pasek z 7 kropkami na dole ekranu |
 | | `Tydzień od poniedziałku` | `tak` | Rozpoczynanie tygodnia od Poniedziałku zamiast Niedzieli |
-| **Karuzela** | `Panele` | `date,temp,weather,pm25` | Lista wyświetlanych paneli w rotacji |
+| **Karuzela** | `Panele` | `date,temp,weather,pm25` | Kolejność paneli w rotacji (rozdzielone przecinkami) |
 | | `Czas daty`, `Czas paneli` | `10s / 3s` | Czas wyświetlania daty oraz pozostałych paneli |
 | | `Czas panelu pogody` | `10 s` | Osobny czas panelu pogody (ikonka + przewijany opis) |
+| | `Faza księżyca` | `tak` | Panel karuzeli z ikonką aktualnej fazy księżyca |
 | | `Przejście` | `przetarcie` | Animacja przejścia (`przetarcie`, `zanikanie`, `przejście`, `dół`, `góra`, `lewo`, `prawo`, `brak`) |
 | **Pogoda i Powietrze** | `Lat`, `Lon` | — | Współrzędne dla Open-Meteo **i Meteoalarmu** |
 | | `Odświeżanie` | `15 min` | Częstotliwość pobierania danych pogodowych z API |

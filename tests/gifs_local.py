@@ -3,7 +3,8 @@ dist/nimbus-tc002.ax against a software framebuffer with the firmware's small 3x
 frames and writes docs/meteoalarm.gif (sheet face: carousel -> alert tile + full-width message ->
 carousel incl. the weather panel: small icon + purple description, static when it fits and
 scrolling left when it does not), docs/meteoalarm-big.gif (big face: 5-letter weekday + date ->
-ALARM + hazard time) and docs/weather-*.gif, one animated GIF per WMO weather state.
+ALARM + hazard time), docs/weather-*.gif (one animated GIF per WMO weather state) and
+docs/moon.gif (the moon-phase carousel panel).
 
 Usage: python3 tests/gifs_local.py
 Requires: network (downloads berry-lang once), gcc and make; writes docs/*.gif
@@ -286,7 +287,7 @@ class _Store
       "sweep": true, "t24": true, "tlz": true, "tsep": "stały", "tcol": 0xFFFFFF,
       "chc": 0xFF0000, "ctc": 0x000000, "cbc": 0xFFFFFF, "wbar": true, "wmon": true,
       "wtd": 0xFFFFFF, "wod": 0x666666, "wtw": 0xFFFFFF, "wow": 0x666666,
-      "tran": "przetarcie", "ddur": 2, "pdur": 2, "wdur": 2, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
+      "tran": "przetarcie", "ddur": 2, "pdur": 2, "wdur": 2, "moon": true, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
       "nauto": false, "nfrom": 22, "nto": 7, "nbar": true, "npause": false, "nbri": 0,
       "face": face, "canim": false, "dfmt": "dd.mm.yy", "showpm": true,
       "panels": "date,temp,weather,pm25,meteoalarm", "lat": 52.23, "lon": 21.01,
@@ -453,6 +454,21 @@ run_scene("kartka", 6, "S3", {
 run_scene("kartka", 6, "S4", {
   "meteoalarm_enabled": false, "panels": "weather", "wdur": 8, "wcode": 66
 })
+run_scene("kartka", 5, "S5", {
+  "meteoalarm_enabled": false, "panels": "moon", "warm": true
+})
+run_scene("kartka", 22, "S6", {
+  "meteoalarm_enabled": false, "warm": true
+})
+run_scene("kartka", 4, "S7", {
+  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true
+})
+run_scene("pierścień", 4, "S8", {
+  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true
+})
+run_scene("duży", 4, "S9", {
+  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true
+})
 var WC = [%s]
 var wi = 0
 while wi < size(WC)
@@ -542,10 +558,11 @@ def dump(f):
 
 
 def check_help_limits():
-    """AWTRIX NG truncates @config help texts to 96 chars (kMaxHelpLen in ScriptConfig.cpp)."""
+    """AWTRIX NG truncates @config help texts to 96 bytes (kMaxHelpLen in ScriptConfig.cpp,
+    counted over UTF-8 bytes - Polish letters take two)."""
     src = (ROOT / "dist" / "nimbus-tc002.ax").read_text(encoding="utf-8")
     for m in re.finditer(r'help="([^"]*)"', src):
-        assert len(m.group(1)) <= 96, "help longer than 96 chars: " + m.group(1)
+        assert len(m.group(1).encode("utf-8")) <= 96, "help longer than 96 bytes: " + m.group(1)
 
 
 def checks(scenes):
@@ -631,6 +648,30 @@ def check_weather_gifs(scenes):
     fs = scenes["W45"]
     assert any(fs[i][y * W + x] != fs[i + 7][y * W + x]
                for i in range(12, 20) for y in range(1, 10) for x in range(15)), "fog is not animated"
+    # the moon panel appears at the end of the carousel cycle: warm-white lit moon on black
+    s1m = scenes["S1"]
+    moonf = [i for i, f in enumerate(s1m)
+             if any(f[y * W + x] == 0xF0DC8C for y in range(0, 15) for x in range(15))]
+    assert moonf, "no moon-panel frames in S1"
+    f = s1m[min(moonf[0] + 6, len(s1m) - 1)]
+    assert any(f[15 * W + x] for x in range(17, 51)), "week bar missing during the moon panel"
+    s5 = scenes["S5"]
+    f = s5[10]
+    assert any(f[y * W + x] == 0xF0DC8C for y in range(0, 15) for x in range(15)), "S5: no lit moon"
+    assert any(f[y * W + x] == 0x3C3C3C for y in range(0, 15) for x in range(15)), "S5: no moon outline"
+    assert any(f[15 * W + x] for x in range(17, 51)), "S5: week bar missing during the moon panel"
+    # the demo carousel cycle: date card, weather, pm25 and the moon all appear
+    s6 = scenes["S6"]
+    assert any(s6[i][0] == 0xFF0000 for i in range(len(s6))), "S6: no date card"
+    assert any(s6[i][y * W + x] == 0xC24CFF for i in range(len(s6)) for y in range(10, 15) for x in range(W)), \
+        "S6: no weather description"
+    assert any(s6[i][y * W + x] == 0x00FF00 for i in range(len(s6)) for y in range(0, 16) for x in range(15)), \
+        "S6: no pm25 panel"
+    assert any(s6[i][y * W + x] == 0xF0DC8C for i in range(len(s6)) for y in range(0, 15) for x in range(15)), \
+        "S6: no moon panel"
+    # face previews are non-empty
+    for marker in ("S7", "S8", "S9"):
+        assert any(scenes[marker][5]), "%s: empty preview frame" % marker
     s2 = scenes["S2"]
     # big face: 5-letter red weekday + white date line at the bottom
     f = s2[10]
@@ -659,13 +700,19 @@ def main():
         print("--- stderr ---\n%s" % e.stderr[-3000:])
         raise
     scenes = parse_frames(out)
-    assert "S1" in scenes and "S2" in scenes and "S3" in scenes and "S4" in scenes, (out[-500:])
+    assert "S1" in scenes and "S2" in scenes and "S3" in scenes and "S4" in scenes and "S5" in scenes, (out[-500:])
+    assert all(k in scenes for k in ("S6", "S7", "S8", "S9")), (out[-500:])
     check_help_limits()
     checks(scenes)
     check_weather_gifs(scenes)
     docs = ROOT / "docs"
     write_gif(docs / "meteoalarm.gif", scenes["S1"])
     write_gif(docs / "meteoalarm-big.gif", scenes["S2"])
+    write_gif(docs / "moon.gif", scenes["S5"])
+    write_gif(docs / "demo-carousel.gif", scenes["S6"])
+    render(scenes["S7"][5]).save(docs / "tc002-sheet.png")
+    render(scenes["S8"][5]).save(docs / "tc002-ring.png")
+    render(scenes["S9"][5]).save(docs / "tc002-big.png")
     for name in ("meteoalarm.gif", "meteoalarm-big.gif"):
         p = docs / name
         print("%s (%d frames, %d KB)" % (p, len(scenes["S1" if "big" not in name else "S2"]),
