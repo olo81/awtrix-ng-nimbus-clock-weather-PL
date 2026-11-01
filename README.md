@@ -1,7 +1,7 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-[![Version](https://img.shields.io/badge/version-2.7.2%20PL-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-2.8.0%20PL-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -18,11 +18,22 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 
 ---
 
+## 🆕 Nowości w v2.8.0 PL
+
+### 🌦️ Pogoda w pełnej rozdzielczości — 24 stany Open-Meteo
+
+- Każdy kod WMO z Open-Meteo ma teraz **osobny stan** — intensywności nie są już łączone: `SILNA MŻAWKA`, `SILNA MŻAWKA MARZNĄCA`, `SILNY DESZCZ MARZNĄCY`, `ULEWNY PRZELOTNY DESZCZ`, `SILNY PRZELOTNY ŚNIEG`, `BURZA Z SILNYM GRADEM`, a także **`SZADŹ`** (48) i **`PRZEWAŻNIE SŁONECZNIE`** (1).
+- Każdy z 24 stanów ma własną ikonkę (lub animację opadu: kolor + tempo kropel/platków) we wszystkich 6 językach.
+- Domyślne panele karuzeli to teraz **przełączniki z numerami 1–9** w zakładce *Karuzela*, a kolejność ustala się w polu **`Kolejność (numery)`** (numery po przecinku, np. `1,2,3,4,5,6,7,8,9`). Puste pole = kolejność domyślna: pogoda → porywy wiatru (gdy powyżej progu) → data → temperatura → PM2.5 → pokój → wilgotność → księżyc → meteoalarm.
+- Naprawiony błąd, przez który własna kolejność z panelem `humidity`/`room` wywalała aplikację (`key_error`) — szerokość napisu `45%` była liczona czcionką bez znaku `%`.
+
+---
+
 ## 🆕 Nowości w v2.7.2 PL
 
 ### 🌬️ Porywy wiatru na karuzeli
 
-- Nowy panel karuzeli **`wind`**: gdy **porywy wiatru przekraczają ustawiony próg** (domyślnie 40 km/h, dane z Open-Meteo, `wind_gusts_10m`), do rotacji dołącza kafelek z **animowaną ikonką wiatru** (powiewająca czerwono-biała chorągiewka na maszcie) i **prędkością porywów** pod nią.
+- Nowy panel karuzeli **`wind`**: gdy **porywy wiatru przekraczają ustawiony próg** (domyślnie 40 km/h, dane z Open-Meteo, `wind_gusts_10m`), do rotacji dołącza kafelek z **animowaną ikonką wiatru** (powiewająca czerwono-biała chorągiewka na maszcie) i **prędkością porywów** (`np. 100 km/h`) wyświetlaną **statycznie, na fioletowo**, na dole ekranu pod zegarem, od lewej krawędzi — w miejscu paska dni tygodnia, ukrywanego na czas kafelka.
 - Gdy wiatr słabnie poniżej progu, panel sam znika z rotacji.
 - Na czas kafelka **pasek dni tygodnia jest ukryty**, żeby nic nie nachodziło na prędkość (np. `100`).
 - **Opcja włącz/wyłącz `Porywy wiatru`** (grupa *Karuzela*, domyślnie włączona).
@@ -170,40 +181,51 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 | $91 - 150\,\mu\text{g/m}^3$ | 🟣 **Fioletowy** | **Bardzo zła** – poważne przekroczenia |
 | $> 150\,\mu\text{g/m}^3$ | 🔵 **Granatowy** | **Ekstremalna** – zagrożenie dla zdrowia |
 
-### 2. 🌤️ Rozbudowana Pogoda (16 Stanów WMO)
-- Pełna integracja z **Open-Meteo Forecast API** — obsłużone są **wszystkie kody WMO**.
+### 2. 🌤️ Rozbudowana Pogoda (24 Stany WMO)
+- Pełna integracja z **Open-Meteo Forecast API** — obsłużone są **wszystkie kody WMO** z rozróżnieniem intensywności.
 - Na tarczach `kartka` / `pierścień` panel pogody to **mała ikonka na wysokości godziny** z animowanymi kropkami opadów, a pod nią **fioletowy opis stanu** (np. `DESZCZ`) — statyczny przy lewej krawędzi, gdy się mieści, przewijany w lewo, gdy jest dłuższy.
-- **16 stanów pogodowych** z ikonkami pikselowymi i animacjami opadów:
+- **24 stany pogodowe** z ikonkami pikselowymi i animacjami opadów:
 
 | Stan | Kody WMO |
 | :--- | :---: |
 | ☀️ Słonecznie (dzień) / 🌙 Czyste niebo (noc) | `0` |
-| 🌤️ Zachmurzenie | `1`, `2` |
+| 🌤️ Przeważnie słonecznie | `1` |
+| 🌤️ Zachmurzenie | `2` |
 | ☁️ Chmury | `3` |
-| 🌫️ Mgła | `45`, `48` |
-| 🌦️ Mżawka | `51`, `53`, `55` |
-| ❄️ Mżawka marznąca | `56`, `57` |
+| 🌫️ Mgła | `45` |
+| 🌫️ Szadź | `48` |
+| 🌦️ Mżawka | `51`, `53` |
+| 🌦️ Silna mżawka | `55` |
+| ❄️ Mżawka marznąca | `56` |
+| ❄️ Silna mżawka marznąca | `57` |
 | 🌧️ Deszcz | `61`, `63` |
 | ⛈️ Ulewa | `65` |
-| 🧊 Deszcz marznący | `66`, `67` |
+| 🧊 Deszcz marznący | `66` |
+| 🧊 Silny deszcz marznący | `67` |
 | 🌨️ Śnieg | `71`, `73` |
 | ❄️ Śnieżyca | `75` |
 | 🌨️ Krupa śnieżna | `77` |
-| 🌦️ Przelotny deszcz | `80`, `81`, `82` |
-| 🌨️ Przelotny śnieg | `85`, `86` |
+| 🌦️ Przelotny deszcz | `80`, `81` |
+| ⛈️ Ulewny przelotny deszcz | `82` |
+| 🌨️ Przelotny śnieg | `85` |
+| ❄️ Silny przelotny śnieg | `86` |
 | ⛈️ Burza | `95` |
-| 🌩️ Burza z gradem | `96`, `99` |
+| 🌩️ Burza z gradem | `96` |
+| 🌩️ Burza z silnym gradem | `99` |
 
 ### 🎬 Animacje wszystkich stanów (GIF)
 
 | | | |
 | :---: | :---: | :---: |
-| <img src="docs/weather-slonecznie.gif" width="200"><br>Słonecznie | <img src="docs/weather-slonecznie-noc.gif" width="200"><br>Słonecznie (noc) | <img src="docs/weather-zachmurzenie.gif" width="200"><br>Zachmurzenie |
-| <img src="docs/weather-chmury.gif" width="200"><br>Chmury | <img src="docs/weather-mgla.gif" width="200"><br>Mgła | <img src="docs/weather-mzawka.gif" width="200"><br>Mżawka |
-| <img src="docs/weather-mzawka-marznaca.gif" width="200"><br>Mżawka marznąca | <img src="docs/weather-deszcz.gif" width="200"><br>Deszcz | <img src="docs/weather-ulewa.gif" width="200"><br>Ulewa |
-| <img src="docs/weather-deszcz-marznacy.gif" width="200"><br>Deszcz marznący | <img src="docs/weather-snieg.gif" width="200"><br>Śnieg | <img src="docs/weather-sniezyca.gif" width="200"><br>Śnieżyca |
-| <img src="docs/weather-krupa-sniezna.gif" width="200"><br>Krupa śnieżna | <img src="docs/weather-przelotny-deszcz.gif" width="200"><br>Przelotny deszcz | <img src="docs/weather-przelotny-snieg.gif" width="200"><br>Przelotny śnieg |
-| <img src="docs/weather-burza.gif" width="200"><br>Burza | <img src="docs/weather-burza-z-gradem.gif" width="200"><br>Burza z gradem | |
+| <img src="docs/weather-slonecznie.gif" width="200"><br>Słonecznie | <img src="docs/weather-slonecznie-noc.gif" width="200"><br>Czyste niebo (noc) | <img src="docs/weather-przewaznie-slonecznie.gif" width="200"><br>Przeważnie słonecznie |
+| <img src="docs/weather-zachmurzenie.gif" width="200"><br>Zachmurzenie | <img src="docs/weather-chmury.gif" width="200"><br>Chmury | <img src="docs/weather-mgla.gif" width="200"><br>Mgła |
+| <img src="docs/weather-szadz.gif" width="200"><br>Szadź | <img src="docs/weather-mzawka.gif" width="200"><br>Mżawka | <img src="docs/weather-silna-mzawka.gif" width="200"><br>Silna mżawka |
+| <img src="docs/weather-mzawka-marznaca.gif" width="200"><br>Mżawka marznąca | <img src="docs/weather-silna-mzawka-marznaca.gif" width="200"><br>Silna mżawka marznąca | <img src="docs/weather-deszcz.gif" width="200"><br>Deszcz |
+| <img src="docs/weather-ulewa.gif" width="200"><br>Ulewa | <img src="docs/weather-deszcz-marznacy.gif" width="200"><br>Deszcz marznący | <img src="docs/weather-silny-deszcz-marznacy.gif" width="200"><br>Silny deszcz marznący |
+| <img src="docs/weather-snieg.gif" width="200"><br>Śnieg | <img src="docs/weather-sniezyca.gif" width="200"><br>Śnieżyca | <img src="docs/weather-krupa-sniezna.gif" width="200"><br>Krupa śnieżna |
+| <img src="docs/weather-przelotny-deszcz.gif" width="200"><br>Przelotny deszcz | <img src="docs/weather-ulewny-przelotny-deszcz.gif" width="200"><br>Ulewny przelotny deszcz | <img src="docs/weather-przelotny-snieg.gif" width="200"><br>Przelotny śnieg |
+| <img src="docs/weather-silny-przelotny-snieg.gif" width="200"><br>Silny przelotny śnieg | <img src="docs/weather-burza.gif" width="200"><br>Burza | <img src="docs/weather-burza-z-gradem.gif" width="200"><br>Burza z gradem |
+| <img src="docs/weather-burza-z-silnym-gradem.gif" width="200"><br>Burza z silnym gradem | | |
 
 ### 3. 🧹 Efekt "Wycieraczki" (Ochrona Matrycy LED)
 - Co dokładnie 5 minut przez ekran przesuwa się płynny, czarny pas czyszczący (800 ms).
@@ -228,25 +250,32 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 
 ## 🎛️ Konfiguracja Karuzeli Paneli
 
-W sekcji **Karuzela** w polu **Panele** możesz ustalić kolejność wyświetlanych widoków (rozdzielając nazwy przecinkami):
+Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grupie **Karuzela**):
+
+| Nr | Panel | Opis widoku |
+| :---: | :--- | :--- |
+| `1` | Pogoda | Mała ikonka pogody + fioletowy opis stanu (statyczny lub przewijany w lewo) |
+| `2` | Porywy wiatru | Pojawia się, gdy porywy przekroczą próg — animowana ikonka + fioletowa prędkość (`100 km/h`) pod zegarem |
+| `3` | Data | Kartka kalendarza / Data |
+| `4` | Temperatura | Temperatura na zewnątrz (Open-Meteo) |
+| `5` | PM2.5 | Stężenie pyłu PM2.5 z dynamicznym tłem |
+| `6` | Pokój | Temperatura w pokoju (czujnik/MQTT); pomijany bez danych |
+| `7` | Wilgotność | Wilgotność w pokoju (czujnik/MQTT); pomijany bez danych |
+| `8` | Faza księżyca | Aktualna faza księżyca — ikonka na czarnym tle |
+| `9` | Meteoalarm | Ostrzeżenia Meteoalarm/IMGW (kafelek `METEOALARM` lub panel `ALARM`) |
+
+**Kolejność ustalasz w polu `Kolejność (numery)`** — wpisujesz numery po przecinku, np.:
 
 ```text
-date, temp, weather, room, humidity, pm25, meteoalarm, moon, wind
+1,2,3,4,5,6,7,8,9
 ```
 
-| Nazwa panela | Opis widoku |
-| :--- | :--- |
-| `date` | Kartka kalendarza / Data |
-| `temp` | Temperatura na zewnątrz (Open-Meteo) |
-| `weather` | Mała ikonka pogody + fioletowy opis stanu (statyczny lub przewijany w lewo) |
-| `pm25` | Stężenie pyłu PM2.5 z dynamicznym tłem |
-| `room` | Temperatura w pokoju (czujnik lokalny lub MQTT) |
-| `humidity` | Wilgotność w pokoju (czujnik lokalny lub MQTT) |
-| `meteoalarm` | Ostrzeżenia Meteoalarm/IMGW (kafelek `METEOALARM` lub panel `ALARM`) |
-| `moon` | Aktualna faza księżyca — ikonka na czarnym tle |
-| `wind` | Porywy wiatru powyżej progu — animowana ikonka + prędkość |
+- Puste pole = **kolejność domyślna** (pogoda → wiatr → data → temperatura → PM2.5 → pokój → wilgotność → księżyc → meteoalarm).
+- Niepełna lista (np. `1,3`) ustawia te panele na początku, a resztę dokleja w kolejności numerów.
+- Panel `2` (porywy wiatru) pojawia się tylko, gdy wiatr przekroczy próg — jego numer w polu kolejności oznacza, gdzie ma się wtedy pojawić.
+- Powtórzone i błędne numery są ignorowane.
 
-> 💡 Panel `meteoalarm` jest automatycznie pokazywany **poza rotacją** — tylko w momencie, gdy obowiązuje komunikat ostrzeżenia (częstotliwość ustawisz w opcjach).
+> 💡 Komunikat meteoalarmu jest pokazywany **poza rotacją** — w momencie, gdy obowiązuje ostrzeżenie (częstotliwość ustawisz w opcjach).
 
 ---
 
@@ -265,11 +294,18 @@ date, temp, weather, room, humidity, pm25, meteoalarm, moon, wind
 | | `Format daty` | `dd.mm.yy` | Format daty na dużej tarczy (`dd.mm.yy`, `mm/dd/yy`, `yy-mm-dd`) |
 | **Pasek tygodnia** | `Pasek tygodnia` | `tak` | Pasek z 7 kropkami na dole ekranu |
 | | `Tydzień od poniedziałku` | `tak` | Rozpoczynanie tygodnia od Poniedziałku zamiast Niedzieli |
-| **Karuzela** | `Panele` | `date,temp,weather,pm25` | Kolejność paneli w rotacji (rozdzielone przecinkami) |
+| **Karuzela** | `1. Pogoda` | `tak` | Panel numer 1 w polu kolejności |
+| | `2. Porywy wiatru` | `tak` | Panel numer 2; pojawia się powyżej progu porywów |
+| | `3. Data` | `tak` | Panel numer 3 |
+| | `4. Temperatura` | `tak` | Panel numer 4 |
+| | `5. PM2.5` | `tak` | Panel numer 5 |
+| | `6. Pokój` | `tak` | Panel numer 6 (pomijany bez danych) |
+| | `7. Wilgotność` | `tak` | Panel numer 7 (pomijany bez danych) |
+| | `8. Faza księżyca` | `tak` | Panel numer 8 |
+| | `9. Meteoalarm` | `nie` | Panel numer 9 (ostrzeżenia IMGW) |
+| | `Kolejność (numery)` | *(puste)* | Numery paneli po przecinku, np. `1,2,3,4,5,6,7,8,9`; puste = domyślna |
 | | `Czas daty`, `Czas paneli` | `10s / 3s` | Czas wyświetlania daty oraz pozostałych paneli |
 | | `Czas panelu pogody` | `10 s` | Osobny czas panelu pogody (ikonka + przewijany opis) |
-| | `Faza księżyca` | `tak` | Panel karuzeli z ikonką aktualnej fazy księżyca |
-| | `Porywy wiatru` | `tak` | Włącz/wyłącz panel porywów wiatru |
 | | `Próg porywów wiatru` | `40 km/h` | Porywy muszą przekroczyć ten próg (10–100 km/h), by kafelek pojawił się w rotacji |
 | | `Przejście` | `przetarcie` | Animacja przejścia (`przetarcie`, `zanikanie`, `przejście`, `dół`, `góra`, `lewo`, `prawo`, `brak`) |
 | **Pogoda i Powietrze** | `Lat`, `Lon` | — | Współrzędne dla Open-Meteo **i Meteoalarmu** |

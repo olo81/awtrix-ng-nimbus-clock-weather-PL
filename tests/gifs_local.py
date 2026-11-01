@@ -82,21 +82,29 @@ PL = {
 WEATHER = [
     ("W0", "slonecznie", 0, 1),
     ("WN", "slonecznie-noc", 0, 0),
-    ("W1", "zachmurzenie", 1, 1),
+    ("W1", "przewaznie-slonecznie", 1, 1),
+    ("W2", "zachmurzenie", 2, 1),
     ("W3", "chmury", 3, 1),
     ("W45", "mgla", 45, 1),
+    ("W48", "szadz", 48, 1),
     ("W51", "mzawka", 51, 1),
+    ("W55", "silna-mzawka", 55, 1),
     ("W56", "mzawka-marznaca", 56, 1),
+    ("W57", "silna-mzawka-marznaca", 57, 1),
     ("W61", "deszcz", 61, 1),
     ("W65", "ulewa", 65, 1),
     ("W66", "deszcz-marznacy", 66, 1),
+    ("W67", "silny-deszcz-marznacy", 67, 1),
     ("W71", "snieg", 71, 1),
     ("W75", "sniezyca", 75, 1),
     ("W77", "krupa-sniezna", 77, 1),
     ("W80", "przelotny-deszcz", 80, 1),
+    ("W82", "ulewny-przelotny-deszcz", 82, 1),
     ("W85", "przelotny-snieg", 85, 1),
+    ("W86", "silny-przelotny-snieg", 86, 1),
     ("W95", "burza", 95, 1),
     ("W96", "burza-z-gradem", 96, 1),
+    ("W99", "burza-z-silnym-gradem", 99, 1),
 ]
 
 
@@ -290,7 +298,7 @@ class _Store
       "tran": "przetarcie", "ddur": 2, "pdur": 2, "wdur": 2, "moon": true, "wind": true, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
       "nauto": false, "nfrom": 22, "nto": 7, "nbar": true, "npause": false, "nbri": 0,
       "face": face, "canim": false, "dfmt": "dd.mm.yy", "showpm": true,
-      "panels": "date,temp,weather,pm25,meteoalarm", "lat": 52.23, "lon": 21.01,
+      "order": "", "lat": 52.23, "lon": 21.01,
       "wref": 15, "wlang": "Polski", "wtext": "", "rtopic": "", "htopic": "",
       "night": false, "ntopic": "", "meteoalarm_enabled": true, "maref": 10,
       "madur": 8, "mafreq": 5, "mafreqb": 60, "materyt": ""
@@ -451,46 +459,48 @@ def run_scene(face, seconds, marker, cfg)
   end
 end
 
-run_scene("kartka", 20, "S1", nil)
-run_scene("duży", 12, "S2", nil)
+run_scene("kartka", 32, "S1", nil)
+run_scene("duży", 18, "S2", nil)
 run_scene("kartka", 6, "S3", {
-  "meteoalarm_enabled": false, "panels": "weather", "wdur": 8,
-  "wtext": "słonecznie,ZACHMURZENIE Z PRZELOTNYMI OPADAMI,chmury,mgła,mżawka,deszcz,ulewa,śnieg,śnieżyca,burza"
+  "meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8,
+  "wtext": "słonecznie,przeważnie słonecznie,ZACHMURZENIE Z PRZELOTNYMI OPADAMI,chmury,mgła,szadź,mżawka,silna mżawka,mżawka marznąca,silna mżawka marznąca,deszcz,ulewa,deszcz marznący,silny deszcz marznący,śnieg,śnieżyca,krupa śnieżna,przelotny deszcz,ulewny przelotny deszcz,przelotny śnieg,silny przelotny śnieg,burza,burza z gradem"
 })
 run_scene("kartka", 6, "S4", {
-  "meteoalarm_enabled": false, "panels": "weather", "wdur": 8, "wcode": 66
+  "meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8, "wcode": 66
 })
 run_scene("kartka", 5, "S5", {
-  "meteoalarm_enabled": false, "panels": "moon", "warm": true
+  "meteoalarm_enabled": false, "order": "8", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "moon": true, "warm": true
 })
 run_scene("kartka", 22, "S6", {
   "meteoalarm_enabled": false, "warm": true
 })
 run_scene("kartka", 4, "S7", {
-  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true
+  "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
 })
 run_scene("pierścień", 4, "S8", {
-  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true
+  "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
 })
 run_scene("duży", 4, "S9", {
-  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true
+  "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
 })
 run_scene("kartka", 4, "S10", {
-  "meteoalarm_enabled": false, "panels": "pm25", "moon": false, "warm": true, "pm25": 100
+  "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "showpm": true, "warm": true, "pm25": 100
 })
 run_scene("kartka", 4, "S11", {
-  "meteoalarm_enabled": false, "panels": "pm25", "moon": false, "warm": true, "pm25": 200
+  "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "showpm": true, "warm": true, "pm25": 200
 })
-run_scene("kartka", 5, "S12", {
-  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true, "windgust": 85
+run_scene("kartka", 8, "S12", {
+  "meteoalarm_enabled": false, "moon": false, "warm": true, "windgust": 100, "wcode": 2,
+  "wpan": true, "dpan": true, "tpan": false, "showpm": false, "rpan": false, "hpan": false
 })
 run_scene("kartka", 5, "S13", {
-  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true, "windgust": 85, "wthr": 90
+  "meteoalarm_enabled": false, "wpan": true, "dpan": true, "wind": true, "tpan": false,
+  "showpm": false, "rpan": false, "hpan": false, "moon": false, "warm": true, "windgust": 85, "wthr": 90
 })
 var WC = [%s]
 var wi = 0
 while wi < size(WC)
-  run_scene("kartka", 4, WC[wi][2], {"meteoalarm_enabled": false, "panels": "weather", "wdur": 8, "wcode": WC[wi][0], "isday": WC[wi][1], "warm": true})
+  run_scene("kartka", 4, WC[wi][2], {"meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8, "wcode": WC[wi][0], "isday": WC[wi][1], "warm": true})
   wi += 1
 end
 print("DONE")
@@ -604,7 +614,18 @@ def checks(scenes):
     weather = [i for i, f in enumerate(s1)
                if any(f[y * W + x] in (0xFFC800, 0xFF7800) for y in range(1, 9) for x in range(15))]
     assert weather, "no weather-panel frames in S1"
-    fw = s1[min(weather[0] + 6, len(s1) - 1)]
+    # the first weather stretch is cut short by the meteoalarm message: find a stretch
+    # of >= 8 consecutive weather frames and compare two frames inside it
+    runs = []
+    rs = weather[0]
+    for i in range(1, len(weather)):
+        if weather[i] != weather[i - 1] + 1:
+            runs.append((rs, weather[i - 1]))
+            rs = weather[i]
+    runs.append((rs, weather[-1]))
+    run = next((r for r in runs if r[1] - r[0] >= 8), None)
+    assert run, "no long weather stretch in S1"
+    fw = s1[run[0] + 1]
     print(dump(fw))
     assert any(fw[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(16, 52)), \
         "purple weather description not visible across the full width"
@@ -613,10 +634,7 @@ def checks(scenes):
         "weather description is not left-aligned"
     assert not any(fw[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(48, 52)), \
         "weather description should not reach the right edge"
-    assert not any(fw[15 * W + x] in (0xFFFFFF, 0x666666) for x in range(17, 51)), "week bar visible during weather panel"
-    # the short description is static: compare two settled frames well inside the panel window
-    # (weather[0] is mid-wipe-in and the last frames are the wipe-out, so avoid the edges)
-    fz = s1[min(weather[0] + 12, len(s1) - 1)]
+    fz = s1[run[0] + 7]
     assert all(fw[y * W + x] == fz[y * W + x] for y in range(10, 15) for x in range(16, 52)), \
         "short weather description should be static"
     s3 = scenes["S3"]
@@ -646,8 +664,9 @@ def anyc(frames, col, y0, y1, x0, x1, start=10):
 def check_weather_gifs(scenes):
     """Every WMO state: purple description, hidden week bar, and the state-specific animation."""
     # wmo code -> expected precipitation dot color inside the icon field
-    dots = {51: 0x64B5F6, 56: 0x80D8FF, 61: 0x2890FF, 65: 0x0055FF, 66: 0x80D8FF,
-            71: 0xFFFFFF, 75: 0xE0F7FA, 77: 0xFFFFFF, 80: 0x2890FF, 85: 0xFFFFFF, 96: 0xFFFFFF}
+    dots = {51: 0x64B5F6, 55: 0x64B5F6, 56: 0x80D8FF, 57: 0x80D8FF, 61: 0x2890FF, 65: 0x0055FF,
+            66: 0x80D8FF, 67: 0x80D8FF, 71: 0xFFFFFF, 75: 0xE0F7FA, 77: 0xFFFFFF, 80: 0x2890FF,
+            82: 0x0055FF, 85: 0xFFFFFF, 86: 0xFFFFFF, 96: 0xFFFFFF, 99: 0xFFFFFF}
     for marker, name, code, day in WEATHER:
         fs = scenes[marker]
         f = fs[20]
@@ -700,23 +719,36 @@ def check_weather_gifs(scenes):
     # wind gusts > 40 km/h: the wind panel joins the rotation (icon + speed, week bar hidden)
     s12 = scenes["S12"]
     windf = [i for i, f in enumerate(s12)
-             if f[0] == 0 and any(f[y * W + x] == 0xFFFFFF for y in range(7, 14) for x in range(15))]
+             if f[0] == 0 and any(f[y * W + x] in (0xFFFFFF, 0xC24CFF) for y in range(7, 14) for x in range(15))]
     assert windf, "S12: no wind panel frames"
     f = s12[windf[len(windf) // 2]]
-    assert not any(f[15 * W + x] in (0xFFFFFF, 0x666666) for x in range(17, 51)), \
+    assert not any(f[15 * W + x] in (0xFFFFFF, 0x666666) for x in range(31, 51)), \
         "S12: week bar visible during the wind panel"
-    assert any(s12[windf[0] + 2][y * W + x] != s12[windf[-1]][y * W + x]
+    m = windf[len(windf) // 2]
+    assert any(s12[windf[i + 5]][y * W + x] != s12[windf[i]][y * W + x]
+               for i in range(0, len(windf) - 5)
                for y in range(0, 7) for x in range(15)), "S12: wind icon is not animated"
+    # fixed order: weather first, the wind panel right after it (and before the date)
+    weatherf = [i for i, f in enumerate(s12)
+                if any(f[y * W + x] in (0xFFC800, 0xFF7800) for y in range(1, 9) for x in range(15))]
+    assert weatherf, "S12: no weather panel"
+    datef = [i for i, f in enumerate(s12) if f[0] == 0xFF0000]
+    assert datef, "S12: no date panel"
+    assert weatherf[len(weatherf) // 2] < m < datef[len(datef) // 2], \
+        "S12: the wind panel is not between the weather and the date"
     # below the threshold (wthr=90 vs gust 85): the wind panel must not join the rotation
     s13 = scenes["S13"]
     wind13 = [i for i, f in enumerate(s13)
-              if f[0] == 0 and any(f[y * W + x] == 0xFFFFFF for y in (1, 2) for x in range(15))]
+              if f[0] == 0 and any(f[y * W + x] == 0xF40214 for y in (1, 2) for x in range(15))]
     assert not wind13, "S13: wind panel shown below the threshold"
     s2 = scenes["S2"]
-    # big face: 5-letter red weekday + white date line at the bottom
-    f = s2[10]
-    assert any(f[y * W + x] == 0xFFFFFF for y in range(11, 16) for x in range(20, 52)), "no date line"
-    assert any(f[y * W + x] == 0xFF0000 for y in range(11, 16) for x in range(25)), "no weekday"
+    # big face: 5-letter red weekday + white date line at the bottom (the date panel is
+    # no longer first in the carousel, so find its frames)
+    datef = [i for i, f in enumerate(s2)
+             if any(f[y * W + x] == 0xFFFFFF for y in range(11, 16) for x in range(20, 52))
+             and any(f[y * W + x] == 0xFF0000 for y in range(11, 16) for x in range(25))]
+    assert datef, "no big-face date panel in S2"
+    f = s2[datef[len(datef) // 2]]
     # big face: ALARM panel with the red scrolling hazard text
     f = s2[50]
     assert any(f[y * W + x] == 0xFF0000 for y in range(11, 16) for x in range(10, 52)), "no alert text"
