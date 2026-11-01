@@ -9,7 +9,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CLOCKS = {"tc001": {"port": 8080, "fx": 0, "by": 7}, "tc002": {"port": 8081}}
+CLOCKS = {"tc002": {"port": 8081}}
 SWITCH = 2.5  # seconds to let the device's app transition finish after switching apps
 
 # The firmware's small font as text(x, 6, ...) draws it: rows 1-5, "#" lit, 4 px advance
@@ -57,9 +57,9 @@ class Sim:
     def __init__(self, clock):
         self.clock = clock
         self.base = "http://localhost:%d/api/v1" % CLOCKS[clock]["port"]
-        self.fx = CLOCKS[clock].get("fx")   # TC001 only: x of the 32 px frame, row of the week bar
+        self.fx = CLOCKS[clock].get("fx")
         self.by = CLOCKS[clock].get("by")
-        self.w, self.h = (32, 8) if clock == "tc001" else (52, 16)
+        self.w, self.h = 52, 16
 
     def req(self, method, path, body=None, raw=None, timeout=40):
         data = raw if raw is not None else (None if body is None else json.dumps(body).encode())

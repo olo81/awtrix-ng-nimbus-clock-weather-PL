@@ -28,7 +28,7 @@ RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DAWTRIX_WERROR=OFF \
 EXPOSE 8080
 VOLUME /data
 # --lan listens on all addresses so the published port reaches it; the panel size is the
-# command, 32x8 (TC001) unless sim.sh passes 52x16 (TC002)
+# command, 52x16 for the TC002
 ENTRYPOINT ["/src/build/awtrix-linux", "--data", "/data", "--port", "8080", "--lan", \
             "--webui", "/src/webui/index.html"]
-CMD ["--width", "32", "--height", "8"]
+CMD ["--width", "52", "--height", "16"]

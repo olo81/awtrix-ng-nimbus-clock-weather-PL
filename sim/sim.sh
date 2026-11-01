@@ -1,9 +1,8 @@
 #!/bin/sh
-# AWTRIX NG simulators for Nimbus, from the firmware's own Linux build:
-#   tc001  32x8   http://localhost:8080
+# The AWTRIX NG TC002 simulator for NimbusPL, from the firmware's own Linux build:
 #   tc002  52x16  http://localhost:8081
 # Usage: sim/sim.sh build
-#        sim/sim.sh start|stop|deploy|logs|mqtt [tc001|tc002]   (default tc001)
+#        sim/sim.sh start|stop|deploy|logs|mqtt
 #        sim/sim.sh pub <topic> <payload> [-r]                   (publish on the test broker)
 set -e
 cd "$(dirname "$0")/.."
@@ -18,12 +17,8 @@ if [ "$1" = pub ]; then
   exit 0
 fi
 
-case "${2:-tc001}" in
-  tc001) CLOCK=tc001; NAME=awtrix-sim;       PORT=8080; SIZE="--width 32 --height 8";  DATA=awtrix-sim-data;       ENV= ;;
-  # AWTRIX_SIM_TC002: run the TC002's own clock app (see sim/Dockerfile)
-  tc002) CLOCK=tc002; NAME=awtrix-sim-tc002; PORT=8081; SIZE="--width 52 --height 16"; DATA=awtrix-sim-tc002-data; ENV="-e AWTRIX_SIM_TC002=1" ;;
-  *) echo "Unknown clock '$2': use tc001 or tc002" >&2; exit 1 ;;
-esac
+# AWTRIX_SIM_TC002: run the TC002's own clock app (see sim/Dockerfile)
+CLOCK=tc002; NAME=awtrix-sim-tc002; PORT=8081; SIZE="--width 52 --height 16"; DATA=awtrix-sim-tc002-data; ENV="-e AWTRIX_SIM_TC002=1"
 URL="http://localhost:$PORT"
 
 case "$1" in
@@ -35,7 +30,7 @@ case "$1" in
     docker network create "$NET" >/dev/null 2>&1 || true
     docker rm -f "$NAME" >/dev/null 2>&1 || true
     docker run -d --name "$NAME" --network "$NET" -p "$PORT:8080" -v "$DATA:/data" $ENV "$IMAGE" $SIZE >/dev/null
-    echo "AWTRIX NG $REF simulator ($CLOCK) on $URL"
+    echo "AWTRIX NG $REF TC002 simulator on $URL"
     ;;
   stop)
     docker stop "$NAME" >/dev/null && echo "stopped"
@@ -57,10 +52,10 @@ case "$1" in
     curl -sS -X PUT -H "Content-Type: application/json" \
       -d "{\"mqttEnabled\":true,\"mqttHost\":\"$BROKER\",\"mqttPort\":1883}" "$URL/api/v1/system" >/dev/null
     docker restart "$NAME" >/dev/null
-    echo "$CLOCK simulator connected to $BROKER"
+    echo "TC002 simulator connected to $BROKER"
     ;;
   *)
-    echo "Usage: $0 build | start|stop|deploy|logs|mqtt [tc001|tc002] | pub <topic> <payload> [-r]" >&2
+    echo "Usage: $0 build | start|stop|deploy|logs|mqtt | pub <topic> <payload> [-r]" >&2
     exit 1
     ;;
 esac
