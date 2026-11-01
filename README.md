@@ -1,7 +1,7 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-[![Version](https://img.shields.io/badge/version-2.7.0%20PL-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-2.7.2%20PL-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -15,6 +15,31 @@
 **NimbusPL** to rozbudowany, w pełni spolszczony fork popularnej aplikacji **Nimbus** przeznaczony dla zegarów z małą matrycą LED (52x16) sterowanych oprogramowaniem **AWTRIX Light** lub **Awtrix NG** (np. Ulanzi TC001 / TC002).
 
 Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z Open-Meteo, stężenia pyłów **PM2.5**, odczytów temperatury i wilgotności w pomieszczeniu, ostrzeżeń **Meteoalarm** (IMGW) oraz serii efektów wizualnych (m.in. efekt wycieraczki chroniący matrycę przed powidokami).
+
+---
+
+## 🆕 Nowości w v2.7.2 PL
+
+### 🌬️ Porywy wiatru na karuzeli
+
+- Nowy panel karuzeli **`wind`**: gdy **porywy wiatru przekraczają ustawiony próg** (domyślnie 40 km/h, dane z Open-Meteo, `wind_gusts_10m`), do rotacji dołącza kafelek z **animowaną ikonką wiatru** (powiewająca czerwono-biała chorągiewka na maszcie) i **prędkością porywów** pod nią.
+- Gdy wiatr słabnie poniżej progu, panel sam znika z rotacji.
+- Na czas kafelka **pasek dni tygodnia jest ukryty**, żeby nic nie nachodziło na prędkość (np. `100`).
+- **Opcja włącz/wyłącz `Porywy wiatru`** (grupa *Karuzela*, domyślnie włączona).
+- **Suwak `Próg porywów wiatru`** (10–100 km/h, domyślnie 40): kafelek dołącza do rotacji dopiero, gdy porywy przekroczą tę wartość.
+
+<p align="center">
+  <img src="docs/wind.gif" alt="Porywy wiatru" width="250">
+</p>
+
+---
+
+## 🆕 Nowości w v2.7.1 PL
+
+### 🟣 Nowe kolory PM2.5 dla wysokich stężeń
+
+- Panel PM2.5 ma teraz **6 kolorów**: przy **powyżej 90 µg/m³** tło robi się **fioletowe**, a powyżej **150 µg/m³ — granatowe** (czerwony obejmuje 56–90).
+- Skala rozłożona tak, żeby dobrze różnicowała górny zakres — przydatne, gdy przekroczenia zdarzają się często. Progi dolne (12/35/55) odpowiadają US EPA AQI / indeksowi GIOŚ.
 
 ---
 
@@ -134,14 +159,16 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 ### 1. 🍃 Jakość Powietrza PM2.5 (Open-Meteo Air Quality)
 - **Bez zewnętrznych czujników** – dane o stężeniu pyłów PM2.5 pobierane są automatycznie z darmowego API Open-Meteo na podstawie podanych współrzędnych geograficznych (`Lat`, `Lon`).
 - **Dedykowany układ graficzny:** po lewej stronie wyświetlany jest biały napis **PM**, a po prawej boks z kolorowym tłem i pogrubioną, czarną wartością stężenia.
-- **Dynamiczne kolory wg norm jakości powietrza WHO/UE:**
+- **Dynamiczne kolory wg progów US EPA AQI / polskiego indeksu GIOŚ:**
 
 | Stężenie PM2.5 | Kolor tła | Jakość powietrza |
 | :--- | :---: | :--- |
 | $\le 12\,\mu\text{g/m}^3$ | 🟢 **Zielony** | **Dobra** – czyste powietrze |
 | $13 - 35\,\mu\text{g/m}^3$ | 🟡 **Żółty** | **Umiarkowana** – dopuszczalna jakość |
 | $36 - 55\,\mu\text{g/m}^3$ | 🟠 **Pomarańczowy** | **Niezdrowa** dla grup wrażliwych |
-| $> 55\,\mu\text{g/m}^3$ | 🔴 **Czerwony** | **Zła / Bardzo zła** – wysokie zanieczyszczenie |
+| $56 - 90\,\mu\text{g/m}^3$ | 🔴 **Czerwony** | **Niezdrowa** – wysokie zanieczyszczenie |
+| $91 - 150\,\mu\text{g/m}^3$ | 🟣 **Fioletowy** | **Bardzo zła** – poważne przekroczenia |
+| $> 150\,\mu\text{g/m}^3$ | 🔵 **Granatowy** | **Ekstremalna** – zagrożenie dla zdrowia |
 
 ### 2. 🌤️ Rozbudowana Pogoda (16 Stanów WMO)
 - Pełna integracja z **Open-Meteo Forecast API** — obsłużone są **wszystkie kody WMO**.
@@ -204,7 +231,7 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 W sekcji **Karuzela** w polu **Panele** możesz ustalić kolejność wyświetlanych widoków (rozdzielając nazwy przecinkami):
 
 ```text
-date, temp, weather, room, humidity, pm25, meteoalarm, moon
+date, temp, weather, room, humidity, pm25, meteoalarm, moon, wind
 ```
 
 | Nazwa panela | Opis widoku |
@@ -217,6 +244,7 @@ date, temp, weather, room, humidity, pm25, meteoalarm, moon
 | `humidity` | Wilgotność w pokoju (czujnik lokalny lub MQTT) |
 | `meteoalarm` | Ostrzeżenia Meteoalarm/IMGW (kafelek `METEOALARM` lub panel `ALARM`) |
 | `moon` | Aktualna faza księżyca — ikonka na czarnym tle |
+| `wind` | Porywy wiatru powyżej progu — animowana ikonka + prędkość |
 
 > 💡 Panel `meteoalarm` jest automatycznie pokazywany **poza rotacją** — tylko w momencie, gdy obowiązuje komunikat ostrzeżenia (częstotliwość ustawisz w opcjach).
 
@@ -241,6 +269,8 @@ date, temp, weather, room, humidity, pm25, meteoalarm, moon
 | | `Czas daty`, `Czas paneli` | `10s / 3s` | Czas wyświetlania daty oraz pozostałych paneli |
 | | `Czas panelu pogody` | `10 s` | Osobny czas panelu pogody (ikonka + przewijany opis) |
 | | `Faza księżyca` | `tak` | Panel karuzeli z ikonką aktualnej fazy księżyca |
+| | `Porywy wiatru` | `tak` | Włącz/wyłącz panel porywów wiatru |
+| | `Próg porywów wiatru` | `40 km/h` | Porywy muszą przekroczyć ten próg (10–100 km/h), by kafelek pojawił się w rotacji |
 | | `Przejście` | `przetarcie` | Animacja przejścia (`przetarcie`, `zanikanie`, `przejście`, `dół`, `góra`, `lewo`, `prawo`, `brak`) |
 | **Pogoda i Powietrze** | `Lat`, `Lon` | — | Współrzędne dla Open-Meteo **i Meteoalarmu** |
 | | `Odświeżanie` | `15 min` | Częstotliwość pobierania danych pogodowych z API |

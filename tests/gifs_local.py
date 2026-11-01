@@ -287,7 +287,7 @@ class _Store
       "sweep": true, "t24": true, "tlz": true, "tsep": "stały", "tcol": 0xFFFFFF,
       "chc": 0xFF0000, "ctc": 0x000000, "cbc": 0xFFFFFF, "wbar": true, "wmon": true,
       "wtd": 0xFFFFFF, "wod": 0x666666, "wtw": 0xFFFFFF, "wow": 0x666666,
-      "tran": "przetarcie", "ddur": 2, "pdur": 2, "wdur": 2, "moon": true, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
+      "tran": "przetarcie", "ddur": 2, "pdur": 2, "wdur": 2, "moon": true, "wind": true, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
       "nauto": false, "nfrom": 22, "nto": 7, "nbar": true, "npause": false, "nbri": 0,
       "face": face, "canim": false, "dfmt": "dd.mm.yy", "showpm": true,
       "panels": "date,temp,weather,pm25,meteoalarm", "lat": 52.23, "lon": 21.01,
@@ -375,14 +375,16 @@ end
 
 var _WC = 2
 var _DAY = 1
+var _PM = 12.3
+var _WG = 25
 class _Http
   def get(url, cb, opts)
     if string.find(url, "imgw") >= 0
       cb('[{"id":"Sk2","nazwa_zdarzenia":"Silny wiatr","stopien":"3","prawdopodobienstwo":"80","obowiazuje_do":"2026-11-04 10:00:00","obowiazuje_od":"2026-11-04 01:00:00","opublikowano":"2026-11-03 11:38:00","tresc":"x","komentarz":"Brak.","biuro":"y","teryt":["1465"]}]', 200)
     elif string.find(url, "air-quality") >= 0
-      cb('{"current":{"pm2_5":12.3}}', 200)
+      cb('{"current":{"pm2_5":' + str(_PM) + '}}', 200)
     else
-      cb('{"current":{"temperature_2m":21.5,"weather_code":' + str(_WC) + ',"is_day":' + str(_DAY) + '}}', 200)
+      cb('{"current":{"temperature_2m":21.5,"weather_code":' + str(_WC) + ',"is_day":' + str(_DAY) + ',"wind_gusts_10m":' + str(_WG) + '}}', 200)
     end
   end
 end
@@ -426,6 +428,10 @@ def run_scene(face, seconds, marker, cfg)
     if wcv != nil _WC = wcv end
     var dv = cfg.find("isday")
     if dv != nil _DAY = dv end
+    var pmv = cfg.find("pm25")
+    if pmv != nil _PM = pmv end
+    var wgv = cfg.find("windgust")
+    if wgv != nil _WG = wgv end
   end
   var n = mk()
   n.init()
@@ -468,6 +474,18 @@ run_scene("pierścień", 4, "S8", {
 })
 run_scene("duży", 4, "S9", {
   "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true
+})
+run_scene("kartka", 4, "S10", {
+  "meteoalarm_enabled": false, "panels": "pm25", "moon": false, "warm": true, "pm25": 100
+})
+run_scene("kartka", 4, "S11", {
+  "meteoalarm_enabled": false, "panels": "pm25", "moon": false, "warm": true, "pm25": 200
+})
+run_scene("kartka", 5, "S12", {
+  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true, "windgust": 85
+})
+run_scene("kartka", 5, "S13", {
+  "meteoalarm_enabled": false, "panels": "date", "moon": false, "warm": true, "windgust": 85, "wthr": 90
 })
 var WC = [%s]
 var wi = 0
@@ -672,6 +690,28 @@ def check_weather_gifs(scenes):
     # face previews are non-empty
     for marker in ("S7", "S8", "S9"):
         assert any(scenes[marker][5]), "%s: empty preview frame" % marker
+    # PM2.5 100 -> purple, 200 -> navy
+    s10 = scenes["S10"]
+    assert any(s10[10][y * W + x] == 0xC24CFF for y in range(0, 16) for x in range(15)), \
+        "S10: pm25 panel is not purple"
+    s11 = scenes["S11"]
+    assert any(s11[10][y * W + x] == 0x0033AA for y in range(0, 16) for x in range(15)), \
+        "S11: pm25 panel is not navy"
+    # wind gusts > 40 km/h: the wind panel joins the rotation (icon + speed, week bar hidden)
+    s12 = scenes["S12"]
+    windf = [i for i, f in enumerate(s12)
+             if f[0] == 0 and any(f[y * W + x] == 0xFFFFFF for y in range(7, 14) for x in range(15))]
+    assert windf, "S12: no wind panel frames"
+    f = s12[windf[len(windf) // 2]]
+    assert not any(f[15 * W + x] in (0xFFFFFF, 0x666666) for x in range(17, 51)), \
+        "S12: week bar visible during the wind panel"
+    assert any(s12[windf[0] + 2][y * W + x] != s12[windf[-1]][y * W + x]
+               for y in range(0, 7) for x in range(15)), "S12: wind icon is not animated"
+    # below the threshold (wthr=90 vs gust 85): the wind panel must not join the rotation
+    s13 = scenes["S13"]
+    wind13 = [i for i, f in enumerate(s13)
+              if f[0] == 0 and any(f[y * W + x] == 0xFFFFFF for y in (1, 2) for x in range(15))]
+    assert not wind13, "S13: wind panel shown below the threshold"
     s2 = scenes["S2"]
     # big face: 5-letter red weekday + white date line at the bottom
     f = s2[10]
@@ -701,7 +741,7 @@ def main():
         raise
     scenes = parse_frames(out)
     assert "S1" in scenes and "S2" in scenes and "S3" in scenes and "S4" in scenes and "S5" in scenes, (out[-500:])
-    assert all(k in scenes for k in ("S6", "S7", "S8", "S9")), (out[-500:])
+    assert all(k in scenes for k in ("S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13")), (out[-500:])
     check_help_limits()
     checks(scenes)
     check_weather_gifs(scenes)
@@ -710,6 +750,7 @@ def main():
     write_gif(docs / "meteoalarm-big.gif", scenes["S2"])
     write_gif(docs / "moon.gif", scenes["S5"])
     write_gif(docs / "demo-carousel.gif", scenes["S6"])
+    write_gif(docs / "wind.gif", scenes["S12"])
     render(scenes["S7"][5]).save(docs / "tc002-sheet.png")
     render(scenes["S8"][5]).save(docs / "tc002-ring.png")
     render(scenes["S9"][5]).save(docs / "tc002-big.png")
