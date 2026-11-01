@@ -3,3 +3,5 @@
 docs/superpowers/
 __pycache__/
 .superpowers/
+# local Berry interpreter built by tests/gifs_local.py
+tests/.berry-cache/
