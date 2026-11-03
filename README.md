@@ -1,15 +1,7 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-<<<<<<< HEAD
-<<<<<<< HEAD
-[![Version](https://img.shields.io/badge/version-2.8.2%20PL-brightgreen.svg)]()
-=======
 [![Version](https://img.shields.io/badge/version-2.9.0%20PL-brightgreen.svg)]()
->>>>>>> 4af9239 (up)
-=======
-[![Version](https://img.shields.io/badge/version-2.9.0%20PL-brightgreen.svg)]()
->>>>>>> 4af9239 (up)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -26,11 +18,6 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 
 ---
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 4af9239 (up)
 ## 🆕 Nowości w v2.9.0 PL
 
 ### 🌍 Wersje językowe
@@ -41,10 +28,6 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 
 ---
 
-<<<<<<< HEAD
->>>>>>> 4af9239 (up)
-=======
->>>>>>> 4af9239 (up)
 ## 🆕 Nowości w v2.8.2 PL
 
 ### 🚨 Meteoalarm na dużej tarczy — nowy wygląd
