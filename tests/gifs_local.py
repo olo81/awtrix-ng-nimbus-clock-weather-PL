@@ -1,5 +1,5 @@
 """README GIFs for NimbusPL without Docker: builds a local Berry interpreter, runs
-dist/nimbus-tc002.ax against a software framebuffer with the firmware's small 3x5 font, captures
+dist/nimbus-tc002-PL.ax against a software framebuffer with the firmware's small 3x5 font, captures
 frames and writes docs/meteoalarm.gif (sheet face: carousel -> alert tile + full-width message ->
 carousel incl. the weather panel: small icon + purple description, static when it fits and
 scrolling left when it does not), docs/meteoalarm-big.gif (big face: 5-letter weekday + date ->
@@ -602,7 +602,7 @@ def dump(f):
 def check_help_limits():
     """AWTRIX NG truncates @config help texts to 96 bytes (kMaxHelpLen in ScriptConfig.cpp,
     counted over UTF-8 bytes - Polish letters take two)."""
-    src = (ROOT / "dist" / "nimbus-tc002.ax").read_text(encoding="utf-8")
+    src = (ROOT / "dist" / "nimbus-tc002-PL.ax").read_text(encoding="utf-8")
     for m in re.finditer(r'help="([^"]*)"', src):
         assert len(m.group(1).encode("utf-8")) <= 96, "help longer than 96 bytes: " + m.group(1)
 
@@ -822,7 +822,7 @@ def main():
     run_dir.mkdir(exist_ok=True)
     (run_dir / "harness.ax").write_text(HARNESS, encoding="utf-8")
     script = run_dir / "nimbus-tc002.ax"
-    script.write_text((ROOT / "dist" / "nimbus-tc002.ax").read_text(encoding="utf-8"), encoding="utf-8")
+    script.write_text((ROOT / "dist" / "nimbus-tc002-PL.ax").read_text(encoding="utf-8"), encoding="utf-8")
     out = None
     try:
         out = subprocess.run([str(berry), "harness.ax"], cwd=run_dir, check=True,

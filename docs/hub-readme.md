@@ -2,7 +2,13 @@
 
 **Rozbudowany, w pełni spolszczony zegar dla AWTRIX NG / AWTRIX Light na matrycy 52×16 (np. Ulanzi TC002).**
 
+<<<<<<< HEAD
 Fork popularnej aplikacji **Nimbus** — godzina, kalendarz z animowaną kartką, **25 stanów pogody Open-Meteo** z animacjami, **PM2.5** z progiem alarmowym, porywy wiatru, faza księżyca, odczyty z pokoju (MQTT / czujnik) oraz **ostrzeżenia Meteoalarm (IMGW)** z automatycznym wykrywaniem powiatu.
+=======
+Fork popularnej aplikacji **Nimbus** — godzina, kalendarz z animowaną kartką, **25 stanów pogody Open-Meteo** z animacjami, **PM2.5** z progiem alarmowym, porywy wiatru, faza księżyca, odczyty z pokoju (MQTT / czujnik) oraz — w wersji polskiej — **ostrzeżenia Meteoalarm (IMGW)** z automatycznym wykrywaniem powiatu.
+
+Dostępne wersje językowe: **PL** (z Meteoalarmem), **EN**, **DE**, **ES**, **PT** — każda z menu i opisami we własnym języku.
+>>>>>>> 4af9239 (up)
 
 ---
 
@@ -28,7 +34,11 @@ Wszystkie stany pogody: [animacje](https://github.com/olo81/awtrix-ng-nimbus-clo
 
 ## 🚀 Instalacja
 
+<<<<<<< HEAD
 1. Pobierz [`dist/nimbus-tc002.ax`](https://raw.githubusercontent.com/olo81/awtrix-ng-nimbus-clock-weather-PL/main/dist/nimbus-tc002.ax).
+=======
+1. Pobierz [`dist/nimbus-tc002-PL.ax`](https://raw.githubusercontent.com/olo81/awtrix-ng-nimbus-clock-weather-PL/main/dist/nimbus-tc002-PL.ax) (lub wersję `-en` / `-de` / `-es` / `-pt` — menu w danym języku, bez Meteoalarmu).
+>>>>>>> 4af9239 (up)
 2. Wgraj plik do katalogu `/apps/` zegara (panel WWW → Files, lub FTP/Samba) i zrestartuj aplikacje.
 3. W ustawieniach aplikacji **NimbusPL** podaj szerokość i długość geograficzną (`Lat`, `Lon`) — służą pogodzie, PM2.5 i automatycznemu powiatowi meteoalarmu.
 4. Aby korzystać z ostrzeżeń, włącz **`9. Meteoalarm`** w zakładce *Karuzela*.

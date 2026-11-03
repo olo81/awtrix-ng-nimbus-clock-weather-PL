@@ -1,7 +1,11 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
+<<<<<<< HEAD
 [![Version](https://img.shields.io/badge/version-2.8.2%20PL-brightgreen.svg)]()
+=======
+[![Version](https://img.shields.io/badge/version-2.9.0%20PL-brightgreen.svg)]()
+>>>>>>> 4af9239 (up)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -18,6 +22,19 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 
 ---
 
+<<<<<<< HEAD
+=======
+## 🆕 Nowości w v2.9.0 PL
+
+### 🌍 Wersje językowe
+
+- Aplikacja podzielona na **5 wersji językowych** w katalogu `dist/`: `nimbus-tc002-PL.ax` (polski), `nimbus-tc002-en.ax` (angielski), `nimbus-tc002-de.ax` (niemiecki), `nimbus-tc002-es.ax` (hiszpański) i `nimbus-tc002-pt.ax` (portugalski).
+- Każda wersja ma **menu, opisy pogody, dni tygodnia i miesiące we własnym języku** — selektor języka i pozostałe tłumaczenia zostały usunięte z kodu.
+- **Meteoalarm (IMGW) z tabelą powiatów TERYT jest tylko w wersji polskiej** — ostrzeżenia IMGW dotyczą wyłącznie Polski, więc wersje zagraniczne są odchudzone o cały ten mechanizm (mniejszy plik, mniej opcji).
+
+---
+
+>>>>>>> 4af9239 (up)
 ## 🆕 Nowości w v2.8.2 PL
 
 ### 🚨 Meteoalarm na dużej tarczy — nowy wygląd
@@ -272,12 +289,12 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 
 ## ⚙️ Instrukcja Instalacji
 
-1. Pobierz plik [`dist/nimbus-tc002.ax`](./dist/nimbus-tc002.ax) z repozytorium.
+1. Pobierz plik z katalogu [`dist/`](./dist/) — wybierz wersję językową: **`nimbus-tc002-PL.ax`** (polski, z Meteoalarmem IMGW) lub `nimbus-tc002-en.ax` / `-de.ax` / `-es.ax` / `-pt.ax` (menu w danym języku, bez Meteoalarmu).
 2. Otwórz panel zarządzania zegarem AWTRIX w przeglądarce (wpisz adres IP zegara w sieci lokalnej).
 3. Przejdź do zakładki **Files** / **Apps** (lub połącz się przez FTP/Samba).
-4. Wgraj plik `nimbus-tc002.ax` do katalogu `/apps/`.
+4. Wgraj plik do katalogu `/apps/`.
 5. Zrestartuj zegar lub przeładuj aplikacje.
-6. W ustawieniach aplikacji (pozycja **NimbusPL**) wprowadź swoje współrzędne geograficzne (`Lat`, `Lon`) — posłużą do pogody, PM2.5 i meteoalarmu. Aby korzystać z ostrzeżeń, włącz **`Włącz Meteoalarm`**.
+6. W ustawieniach aplikacji (pozycja **NimbusPL** — lub NimbusEN/DE/ES/PT) wprowadź swoje współrzędne geograficzne (`Lat`, `Lon`) — posłużą do pogody, PM2.5 i (w wersji PL) meteoalarmu. Aby korzystać z ostrzeżeń, włącz **`Włącz Meteoalarm`**.
 
 ---
 
