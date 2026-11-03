@@ -1,7 +1,7 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-[![Version](https://img.shields.io/badge/version-2.8.0%20PL-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-2.8.2%20PL-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -15,6 +15,39 @@
 **NimbusPL** to rozbudowany, w pełni spolszczony fork popularnej aplikacji **Nimbus** przeznaczony dla zegarów z małą matrycą LED (52x16) sterowanych oprogramowaniem **AWTRIX Light** lub **Awtrix NG** (np. Ulanzi TC002).
 
 Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z Open-Meteo, stężenia pyłów **PM2.5**, odczytów temperatury i wilgotności w pomieszczeniu, ostrzeżeń **Meteoalarm** (IMGW) oraz serii efektów wizualnych (m.in. efekt wycieraczki chroniący matrycę przed powidokami).
+
+---
+
+## 🆕 Nowości w v2.8.2 PL
+
+### 🚨 Meteoalarm na dużej tarczy — nowy wygląd
+
+- Na tarczy **duży** alert to teraz przewijany pasek: czarny napis **`METEOALARM`** na tle w kolorze stopnia zagrożenia, a za nim **komunikat w kolorze zagrożenia** — całość **przesuwa się razem** w lewo (mała przerwa i ponownie).
+
+### 🔧 Poprawki
+
+- **Panel wilgotności** nie dublował już znaku procentu (`45%` zamiast `45%%`) na tarczy kartka/pierścień i dużej.
+- **Kod WMO 99 (`burza z silnym gradem`)** ma teraz osobny stan — wcześniej wyświetlał się jako zwykła *burza z gradem*. Dodany do wszystkich 6 języków, z własną ikonką i animacją.
+
+---
+
+## 🆕 Nowości w v2.8.1 PL
+
+### 🌡️ Temperatury ujemne na tarczach `kartka` i `pierścień`
+
+- Wartości z minusem (np. `-20`) zawsze używają **mniejszej czcionki** — minus i dwie cyfry mieszczą się bez przewijania, a kropka stopnia ma stały odstęp. Pozytywne dwucyfrowe wartości dalej używają dużej czcionki.
+
+### 📊 Próg PM2.5 w karuzeli
+
+- Nowa opcja **`Próg PM2.5`** (1–100 µg/m³, domyślnie **30**): kafelek PM2.5 pojawia się w rotacji **tylko wtedy, gdy stężenie przekroczy próg** — dokładnie tak jak porywy wiatru. Przy czystym powietrzu panel znika z karuzeli.
+
+### ☁️ Nowe opisy pogody
+
+- `chmury` → **`zachmurzenie`**, a dotychczasowe `zachmurzenie` → **`przelotne zachmurzenie`** (kody WMO 2 i 3).
+
+### 🧊 Animacja ślizgającej się postaci
+
+- Dla **marznącej mżawki i marznącego deszczu** (kody 56, 57, 66, 67) pod ikonką rozgrywa się w pętli scenka: **postać w czerwonej kurtce wchodzi na ekran, ślizga się, przewraca z nogami w górze, wstaje i wychodzi** — biała głowa i kończyny, czerwony tułów, na tle lodowoniebieskich kropel opadu.
 
 ---
 
@@ -124,7 +157,7 @@ Na tarczy **kartka** / **pierścień** alert wygląda tak (kafelek `METEOALARM` 
   <img src="docs/meteoalarm.gif" alt="Meteoalarm na tarczy kartka" width="450">
 </p>
 
-Na tarczy **duży** alert pojawia się jako panel `ALARM` z przewijanym tekstem:
+Na tarczy **duży** alert pojawia się jako przewijany pasek: czarny napis `METEOALARM` na tle w kolorze zagrożenia, a obok niego **komunikat w kolorze zagrożenia** — przesuwają się razem:
 
 <p align="center">
   <img src="docs/meteoalarm-big.gif" alt="Meteoalarm na tarczy duży" width="450">
@@ -156,7 +189,7 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 2. Aplikacja bierze współrzędne `Lat`/`Lon` (te same, których używa Open-Meteo) i dopasowuje do nich **najbliższy powiat** z wbudowanej tabeli 380 powiatów (kod TERYT + środek). Jeśli chcesz wymusić konkretny powiat, wpisz jego 4-cyfrowy kod w polu **`TERYT powiatu`** (np. `1465` dla Warszawy). Kody powiatów znajdziesz w wyszukiwarce GUS: [eteryt.stat.gov.pl](https://eteryt.stat.gov.pl/).
 3. Co `Odświeżanie Meteoalarmu` (domyślnie 10 min) aplikacja odpytuje API IMGW o ostrzeżenia dla tego powiatu.
 4. Gdy jest aktywne ostrzeżenie, co `Częstotliwość w trakcie zagrożenia` (domyślnie 10 min) wyświetla komunikat; gdy ostrzeżenie jeszcze nie obowiązuje — co `Częstotliwość przed zagrożeniem` (domyślnie 60 min).
-5. Komunikat (długość ustawia `Czas komunikatu`) **przejmuje pole karuzeli**: na tarczy kartka/pierścień pojawia się kafelek `METEOALARM` + tekst na całej szerokości pod zegarem (pasek dni tygodnia jest wtedy schowany), a na tarczy duży — panel `ALARM` w miejscu linii daty.
+5. Komunikat (długość ustawia `Czas komunikatu`) **przejmuje pole karuzeli**: na tarczy kartka/pierścień pojawia się kafelek `METEOALARM` + tekst na całej szerokości pod zegarem (pasek dni tygodnia jest wtedy schowany), a na tarczy duży — przewijany pasek `METEOALARM` z komunikatem w miejscu linii daty.
 6. Po zakończeniu komunikatu karuzela wraca do normalnego działania.
 
 > ℹ️ **Dlaczego podpowiedzi w panelu są krótkie?** AWTRIX NG ucina teksty pomocy (`help`) do 96 znaków i nie renderuje w nich linków — to limit firmware, którego aplikacja nie może obejść. Pełne opisy, linki i instrukcje znajdziesz w tym README (oraz na stronie aplikacji w AWTRIX Hub).
@@ -181,17 +214,17 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 | $91 - 150\,\mu\text{g/m}^3$ | 🟣 **Fioletowy** | **Bardzo zła** – poważne przekroczenia |
 | $> 150\,\mu\text{g/m}^3$ | 🔵 **Granatowy** | **Ekstremalna** – zagrożenie dla zdrowia |
 
-### 2. 🌤️ Rozbudowana Pogoda (24 Stany WMO)
+### 2. 🌤️ Rozbudowana Pogoda (25 Stanów WMO)
 - Pełna integracja z **Open-Meteo Forecast API** — obsłużone są **wszystkie kody WMO** z rozróżnieniem intensywności.
 - Na tarczach `kartka` / `pierścień` panel pogody to **mała ikonka na wysokości godziny** z animowanymi kropkami opadów, a pod nią **fioletowy opis stanu** (np. `DESZCZ`) — statyczny przy lewej krawędzi, gdy się mieści, przewijany w lewo, gdy jest dłuższy.
-- **24 stany pogodowe** z ikonkami pikselowymi i animacjami opadów:
+- **25 stanów pogodowych** z ikonkami pikselowymi i animacjami opadów:
 
 | Stan | Kody WMO |
 | :--- | :---: |
 | ☀️ Słonecznie (dzień) / 🌙 Czyste niebo (noc) | `0` |
 | 🌤️ Przeważnie słonecznie | `1` |
-| 🌤️ Zachmurzenie | `2` |
-| ☁️ Chmury | `3` |
+| 🌤️ Przelotne zachmurzenie | `2` |
+| ☁️ Zachmurzenie | `3` |
 | 🌫️ Mgła | `45` |
 | 🌫️ Szadź | `48` |
 | 🌦️ Mżawka | `51`, `53` |
@@ -218,7 +251,7 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 | | | |
 | :---: | :---: | :---: |
 | <img src="docs/weather-slonecznie.gif" width="200"><br>Słonecznie | <img src="docs/weather-slonecznie-noc.gif" width="200"><br>Czyste niebo (noc) | <img src="docs/weather-przewaznie-slonecznie.gif" width="200"><br>Przeważnie słonecznie |
-| <img src="docs/weather-zachmurzenie.gif" width="200"><br>Zachmurzenie | <img src="docs/weather-chmury.gif" width="200"><br>Chmury | <img src="docs/weather-mgla.gif" width="200"><br>Mgła |
+| <img src="docs/weather-zachmurzenie.gif" width="200"><br>Przelotne zachmurzenie | <img src="docs/weather-chmury.gif" width="200"><br>Zachmurzenie | <img src="docs/weather-mgla.gif" width="200"><br>Mgła |
 | <img src="docs/weather-szadz.gif" width="200"><br>Szadź | <img src="docs/weather-mzawka.gif" width="200"><br>Mżawka | <img src="docs/weather-silna-mzawka.gif" width="200"><br>Silna mżawka |
 | <img src="docs/weather-mzawka-marznaca.gif" width="200"><br>Mżawka marznąca | <img src="docs/weather-silna-mzawka-marznaca.gif" width="200"><br>Silna mżawka marznąca | <img src="docs/weather-deszcz.gif" width="200"><br>Deszcz |
 | <img src="docs/weather-ulewa.gif" width="200"><br>Ulewa | <img src="docs/weather-deszcz-marznacy.gif" width="200"><br>Deszcz marznący | <img src="docs/weather-silny-deszcz-marznacy.gif" width="200"><br>Silny deszcz marznący |
@@ -262,7 +295,7 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | `6` | Pokój | Temperatura w pokoju (czujnik/MQTT); pomijany bez danych |
 | `7` | Wilgotność | Wilgotność w pokoju (czujnik/MQTT); pomijany bez danych |
 | `8` | Faza księżyca | Aktualna faza księżyca — ikonka na czarnym tle |
-| `9` | Meteoalarm | Ostrzeżenia Meteoalarm/IMGW (kafelek `METEOALARM` lub panel `ALARM`) |
+| `9` | Meteoalarm | Ostrzeżenia Meteoalarm/IMGW (kafelek `METEOALARM` lub przewijany pasek `METEOALARM` z komunikatem) |
 
 **Kolejność ustalasz w polu `Kolejność (numery)`** — wpisujesz numery po przecinku, np.:
 
@@ -307,6 +340,7 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `Czas daty`, `Czas paneli` | `10s / 3s` | Czas wyświetlania daty oraz pozostałych paneli |
 | | `Czas panelu pogody` | `10 s` | Osobny czas panelu pogody (ikonka + przewijany opis) |
 | | `Próg porywów wiatru` | `40 km/h` | Porywy muszą przekroczyć ten próg (10–100 km/h), by kafelek pojawił się w rotacji |
+| | `Próg PM2.5` | `30` | Stężenie musi osiągnąć ten próg (1–100 µg/m³), by kafelek PM2.5 pojawił się w rotacji |
 | | `Przejście` | `przetarcie` | Animacja przejścia (`przetarcie`, `zanikanie`, `przejście`, `dół`, `góra`, `lewo`, `prawo`, `brak`) |
 | **Pogoda i Powietrze** | `Lat`, `Lon` | — | Współrzędne dla Open-Meteo **i Meteoalarmu** |
 | | `Odświeżanie` | `15 min` | Częstotliwość pobierania danych pogodowych z API |

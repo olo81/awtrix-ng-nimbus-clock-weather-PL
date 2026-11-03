@@ -3,7 +3,8 @@ dist/nimbus-tc002.ax against a software framebuffer with the firmware's small 3x
 frames and writes docs/meteoalarm.gif (sheet face: carousel -> alert tile + full-width message ->
 carousel incl. the weather panel: small icon + purple description, static when it fits and
 scrolling left when it does not), docs/meteoalarm-big.gif (big face: 5-letter weekday + date ->
-ALARM + hazard time), docs/weather-*.gif (one animated GIF per WMO weather state) and
+scrolling alert strip: black METEOALARM on an alert-colored block with the hazard message in the
+alert color, moving together), docs/weather-*.gif (one animated GIF per WMO weather state) and
 docs/moon.gif (the moon-phase carousel panel).
 
 Usage: python3 tests/gifs_local.py
@@ -185,6 +186,8 @@ def width() return 52 end
 def height() return 16 end
 
 var _NOW = 100000
+var _TMP = 21.5
+var _MAEV = "Silny wiatr"
 var _H = 9
 var _Mi = 37
 var _S = 0
@@ -301,7 +304,7 @@ class _Store
       "order": "", "lat": 52.23, "lon": 21.01,
       "wref": 15, "wlang": "Polski", "wtext": "", "rtopic": "", "htopic": "",
       "night": false, "ntopic": "", "meteoalarm_enabled": true, "maref": 10,
-      "madur": 8, "mafreq": 5, "mafreqb": 60, "materyt": ""
+      "madur": 8, "mafreq": 5, "mafreqb": 60, "materyt": "", "pmthr": 30
     }
   end
   def get(k, d)
@@ -321,7 +324,7 @@ class _Settings
 end
 
 class _Sensor
-  def temperature() return 21.5 end
+  def temperature() return _TMP end
   def humidity() return 45.0 end
 end
 
@@ -388,11 +391,11 @@ var _WG = 25
 class _Http
   def get(url, cb, opts)
     if string.find(url, "imgw") >= 0
-      cb('[{"id":"Sk2","nazwa_zdarzenia":"Silny wiatr","stopien":"3","prawdopodobienstwo":"80","obowiazuje_do":"2026-11-04 10:00:00","obowiazuje_od":"2026-11-04 01:00:00","opublikowano":"2026-11-03 11:38:00","tresc":"x","komentarz":"Brak.","biuro":"y","teryt":["1465"]}]', 200)
+      cb('[{"id":"Sk2","nazwa_zdarzenia":"' + _MAEV + '","stopien":"3","prawdopodobienstwo":"80","obowiazuje_do":"2026-11-04 10:00:00","obowiazuje_od":"2026-11-04 01:00:00","opublikowano":"2026-11-03 11:38:00","tresc":"x","komentarz":"Brak.","biuro":"y","teryt":["1465"]}]', 200)
     elif string.find(url, "air-quality") >= 0
       cb('{"current":{"pm2_5":' + str(_PM) + '}}', 200)
     else
-      cb('{"current":{"temperature_2m":21.5,"weather_code":' + str(_WC) + ',"is_day":' + str(_DAY) + ',"wind_gusts_10m":' + str(_WG) + '}}', 200)
+      cb('{"current":{"temperature_2m":' + str(_TMP) + ',"weather_code":' + str(_WC) + ',"is_day":' + str(_DAY) + ',"wind_gusts_10m":' + str(_WG) + '}}', 200)
     end
   end
 end
@@ -428,6 +431,8 @@ var mk = compile("return NimbusPL()", "string")
 
 def run_scene(face, seconds, marker, cfg)
   store.reset(face)
+  _TMP = 21.5
+  _MAEV = "Silny wiatr"
   if cfg != nil
     for k : cfg.keys()
       store.set(k, cfg[k])
@@ -440,6 +445,10 @@ def run_scene(face, seconds, marker, cfg)
     if pmv != nil _PM = pmv end
     var wgv = cfg.find("windgust")
     if wgv != nil _WG = wgv end
+    var tv = cfg.find("temp")
+    if tv != nil _TMP = tv end
+    var mv = cfg.find("maev")
+    if mv != nil _MAEV = mv end
   end
   var n = mk()
   n.init()
@@ -459,7 +468,7 @@ def run_scene(face, seconds, marker, cfg)
   end
 end
 
-run_scene("kartka", 32, "S1", nil)
+run_scene("kartka", 32, "S1", {"temp": -20.3})
 run_scene("duży", 18, "S2", nil)
 run_scene("kartka", 6, "S3", {
   "meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8,
@@ -472,7 +481,11 @@ run_scene("kartka", 5, "S5", {
   "meteoalarm_enabled": false, "order": "8", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "moon": true, "warm": true
 })
 run_scene("kartka", 22, "S6", {
-  "meteoalarm_enabled": false, "warm": true
+  "meteoalarm_enabled": false, "warm": true, "pm25": 32, "temp": -20.3
+})
+run_scene("kartka", 6, "S14", {
+  "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false,
+  "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false, "warm": true, "pm25": 12
 })
 run_scene("kartka", 4, "S7", {
   "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
@@ -503,6 +516,7 @@ while wi < size(WC)
   run_scene("kartka", 4, WC[wi][2], {"meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8, "wcode": WC[wi][0], "isday": WC[wi][1], "warm": true})
   wi += 1
 end
+run_scene("duży", 12, "S15", {"maev": "Opady marznące"})
 print("DONE")
 ''' % (", ".join('"%s"' % c for c in CAPS), ", ".join('"%s"' % c for c in LOWC),
        ", ".join('"%s": "%s"' % (k, v) for k, v in DIGITS.items()),
@@ -629,14 +643,10 @@ def checks(scenes):
     print(dump(fw))
     assert any(fw[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(16, 52)), \
         "purple weather description not visible across the full width"
-    # left-aligned: the short description starts at the left edge and ends before x=48
-    assert any(fw[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(0, 4)), \
-        "weather description is not left-aligned"
-    assert not any(fw[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(48, 52)), \
-        "weather description should not reach the right edge"
+    # the default WMO-2 description ("PRZELOTNE ZACHMURZENIE") no longer fits, so it scrolls
     fz = s1[run[0] + 7]
-    assert all(fw[y * W + x] == fz[y * W + x] for y in range(10, 15) for x in range(16, 52)), \
-        "short weather description should be static"
+    assert any(fw[y * W + x] != fz[y * W + x] for y in range(10, 15) for x in range(16, 52)), \
+        "weather description is not scrolling"
     s3 = scenes["S3"]
     # a long description scrolls left across the width (purple, week bar hidden)
     assert any(f[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(16, 52)
@@ -679,7 +689,7 @@ def check_weather_gifs(scenes):
     assert anyc(scenes["W0"], 0xFFC800, 1, 9, 0, 15), "W0: no yellow sun"
     assert anyc(scenes["WN"], 0xF0DC8C, 1, 9, 0, 15), "WN: no moon"
     assert anyc(scenes["W1"], 0xFFC800, 1, 9, 0, 15), "W1: no sun behind the cloud"
-    for marker in ("W95", "W96"):
+    for marker in ("W95", "W96", "W99"):
         assert anyc(scenes[marker], 0xFFC800, 1, 10, 0, 15), "%s: no lightning flash" % marker
     # fog alternates between its two layer bitmaps (700 ms apart)
     fs = scenes["W45"]
@@ -702,19 +712,35 @@ def check_weather_gifs(scenes):
     assert any(s6[i][0] == 0xFF0000 for i in range(len(s6))), "S6: no date card"
     assert any(s6[i][y * W + x] == 0xC24CFF for i in range(len(s6)) for y in range(10, 15) for x in range(W)), \
         "S6: no weather description"
-    assert any(s6[i][y * W + x] == 0x00FF00 for i in range(len(s6)) for y in range(0, 16) for x in range(15)), \
+    assert any(s6[i][y * W + x] == 0xFFFF00 for i in range(len(s6)) for y in range(0, 16) for x in range(15)), \
         "S6: no pm25 panel"
     assert any(s6[i][y * W + x] == 0xF0DC8C for i in range(len(s6)) for y in range(0, 15) for x in range(15)), \
         "S6: no moon panel"
+    # negative temperature renders in the small font (rows 5-9, nothing in row 4 of the tile
+    # where the big font would start) and shows the minus bar
+    tempf = [i for i, f in enumerate(s6)
+             if any(f[y * W + x] == 0xFFFFFF for y in range(5, 10) for x in range(16))
+             and not any(f[y * W + x] == 0xFFFFFF for y in (4,) for x in range(16))]
+    assert tempf, "S6: no negative-temperature panel in the small font"
+    f = s6[tempf[len(tempf) // 2]]
+    row7 = [f[7 * W + x] == 0xFFFFFF for x in range(16)]
+    assert any(row7[x] and row7[x + 1] and row7[x + 2] for x in range(14)), "S6: no minus bar"
+    # humidity shows a single % after the digits (no doubled %%, which would reach x > 11)
+    humi = [i for i, f in enumerate(s6)
+            if any(f[y * W + x] == 0x00AAFF for y in range(5, 10) for x in range(16))]
+    assert humi, "S6: no humidity panel"
+    f = s6[humi[len(humi) // 2]]
+    bluex = [x for y in range(5, 10) for x in range(16) if f[y * W + x] == 0x00AAFF]
+    assert bluex and max(bluex) <= 11, "S6: humidity shows a doubled percent sign"
     # face previews are non-empty
     for marker in ("S7", "S8", "S9"):
         assert any(scenes[marker][5]), "%s: empty preview frame" % marker
     # PM2.5 100 -> purple, 200 -> navy
     s10 = scenes["S10"]
-    assert any(s10[10][y * W + x] == 0xC24CFF for y in range(0, 16) for x in range(15)), \
+    assert any(s10[i][y * W + x] == 0xC24CFF for i in range(len(s10)) for y in range(0, 16) for x in range(15)), \
         "S10: pm25 panel is not purple"
     s11 = scenes["S11"]
-    assert any(s11[10][y * W + x] == 0x0033AA for y in range(0, 16) for x in range(15)), \
+    assert any(s11[i][y * W + x] == 0x0033AA for i in range(len(s11)) for y in range(0, 16) for x in range(15)), \
         "S11: pm25 panel is not navy"
     # wind gusts > 40 km/h: the wind panel joins the rotation (icon + speed, week bar hidden)
     s12 = scenes["S12"]
@@ -741,6 +767,11 @@ def check_weather_gifs(scenes):
     wind13 = [i for i, f in enumerate(s13)
               if f[0] == 0 and any(f[y * W + x] == 0xF40214 for y in (1, 2) for x in range(15))]
     assert not wind13, "S13: wind panel shown below the threshold"
+    # PM2.5 12 ug/m3 is below the default threshold 30: the PM panel must not join the rotation
+    s14 = scenes["S14"]
+    pm14 = [i for i, f in enumerate(s14)
+            if any(f[y * W + x] == 0x00FF00 for y in range(0, 16) for x in range(15))]
+    assert not pm14, "S14: pm25 panel shown below the threshold"
     s2 = scenes["S2"]
     # big face: 5-letter red weekday + white date line at the bottom (the date panel is
     # no longer first in the carousel, so find its frames)
@@ -749,9 +780,38 @@ def check_weather_gifs(scenes):
              and any(f[y * W + x] == 0xFF0000 for y in range(11, 16) for x in range(25))]
     assert datef, "no big-face date panel in S2"
     f = s2[datef[len(datef) // 2]]
-    # big face: ALARM panel with the red scrolling hazard text
-    f = s2[50]
-    assert any(f[y * W + x] == 0xFF0000 for y in range(11, 16) for x in range(10, 52)), "no alert text"
+    # big face: the alert is a scrolling unit: black METEOALARM on an alert-colored
+    # block plus the message in the alert color, moving together. Verify the
+    # signature of the design: the letter M drawn in black with the red block
+    # showing through its holes.
+    s2 = scenes["S2"]
+    M = ("#...#", "##.##", "#.#.#", "#...#", "#...#")
+    def match_m(f, x0):
+        for r, pat in enumerate(M):
+            for c, ch in enumerate(pat):
+                px = f[(11 + r) * W + x0 + c]
+                if ch == "#" and px != 0x000000:
+                    return False
+                if ch == "." and px != 0xFF0000:
+                    return False
+        return True
+    assert any(match_m(s2[i], x0) for i in range(len(s2)) for x0 in range(W - 4)), \
+        "no black METEOALARM letters on a red block"
+    assert any(s2[i][y * W + x] != s2[i + 20][y * W + x]
+               for i in range(40, 60) for y in range(11, 16) for x in range(52)), \
+        "big-face alert is not scrolling"
+    # Polish diacritics in the alert message: the letter Ą (with ogonek) must render
+    # as part of the red scrolling text
+    s15 = scenes["S15"]
+    AOG = ("##.", "#.#", "###", "#.#", "##.#")
+    def match_ao(f, x0):
+        for r, pat in enumerate(AOG):
+            for c, ch in enumerate(pat):
+                if ch == "#" and f[(11 + r) * W + x0 + c] != 0xFF0000:
+                    return False
+        return True
+    assert any(match_ao(s15[i], x0) for i in range(len(s15)) for x0 in range(W - 3)), \
+        "S15: Polish letter Ą not rendered in the alert message"
 
 
 def main():
@@ -773,7 +833,7 @@ def main():
         raise
     scenes = parse_frames(out)
     assert "S1" in scenes and "S2" in scenes and "S3" in scenes and "S4" in scenes and "S5" in scenes, (out[-500:])
-    assert all(k in scenes for k in ("S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13")), (out[-500:])
+    assert all(k in scenes for k in ("S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15")), (out[-500:])
     check_help_limits()
     checks(scenes)
     check_weather_gifs(scenes)
