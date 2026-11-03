@@ -2,11 +2,7 @@
 # @name NimbusPL
 # @desc Zegar z kalendarzem, pogodą, jakością powietrza PM, odczytami z pomieszczenia i ostrzeżeniami meteoalarm (IMGW)
 # @author AkdM / olo81
-<<<<<<< HEAD:dist/nimbus-tc002.ax
-# @version 2.8.2
-=======
 # @version 2.9.0
->>>>>>> 4af9239 (up):dist/nimbus-tc002-PL.ax
 # @display 52x16
 # @config sweep bool "Efekt wycieraczki (co 5 min)" default=true group="Wyświetlacz" help="Czarny pas czyszczący matrycę przechodzi z prawej do lewej co 5 minut"
 # @config t24 bool "Zegar 24-godzinny" default=true group="Czas"
