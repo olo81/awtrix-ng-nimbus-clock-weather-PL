@@ -129,7 +129,7 @@ var a=0 if b==0 a=(f!=nil&&f[1]=="0")?1:0 elif b==1 a=2 elif b==2 a=3 elif b==3 
   while i<size(p)
     var r=p[i]
     var tp=string.find(r,'"teryt":[')
-    if tp>=0&&string.find(r[tp..],'"'+self.maTeryt)>=0
+    if tp>=0&&(self.maTeryt==""||string.find(r[tp..],'"'+self.maTeryt)>=0)
       var nm=re.search('"nazwa_zdarzenia":"([^"]+)"',r)
       var st=re.search('"stopien":"([0-9])"',r)
       if nm!=nil

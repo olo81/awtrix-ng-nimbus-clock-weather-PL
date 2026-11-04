@@ -9,9 +9,9 @@ weather description lists and the Meteoalarm/TERYT machinery) and writes:
   dist/nimbus-tc002-es.ax  - Spanish UI, no Meteoalarm/TERYT
   dist/nimbus-tc002-pt.ax  - Portuguese UI, no Meteoalarm/TERYT
 
-The non-Polish variants drop the whole Meteoalarm feature (config options, the
-TERYT county table and the message rendering), because IMGW warnings cover
-Poland only.
+The non-Polish variants keep Meteoalarm but drop the TERYT county localization
+(the county table and the materyt option): they show the highest-level warning
+from the whole-country IMGW feed.
 
 The template is the source of truth for the shared code; after editing it run
 this script to regenerate all five dist files.
@@ -130,7 +130,7 @@ LANG = {
     },
     "en": {
         "name": "NimbusEN",
-        "desc": "Clock with calendar, weather, PM2.5 air quality and room values",
+        "desc": "Clock with calendar, weather, PM2.5 air quality, room values and Meteoalarm weather warnings",
         "hub": "",
         "meteo": False,
         "week3": "SUNMONTUEWEDTHUFRISAT",
@@ -174,7 +174,8 @@ LANG = {
             '# @config rpan bool "6. Room" default=true group="Carousel" help="Number 6 in the order field"',
             '# @config hpan bool "7. Humidity" default=true group="Carousel" help="Number 7 in the order field"',
             '# @config moon bool "8. Moon phase" default=true group="Carousel" help="Number 8 in the order field"',
-            '# @config order text "Order (numbers)" default="" group="Carousel" help="Panel numbers separated by commas, e.g. 1,2,3,4,5,6,7,8. Empty = default order"',
+            '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carousel" help="Number 9 in the order field"',
+            '# @config order text "Order (numbers)" default="" group="Carousel" help="Panel numbers separated by commas, e.g. 1,2,3,4,5,6,7,8,9. Empty = default order"',
             '# @config ddur slider "Date duration" default=10 min=1 max=60 unit=s group="Carousel"',
             '# @config pdur slider "Other panels duration" default=3 min=1 max=60 unit=s group="Carousel"',
             '# @config wdur slider "Weather panel duration" default=10 min=1 max=60 unit=s group="Carousel" help="More time to read the scrolling weather description under the icon"',
@@ -185,6 +186,10 @@ LANG = {
             '# @config lon number "Longitude" default=2.3522 min=-180 max=180 step=0.0001 group="Weather & Air"',
             '# @config wref number "Refresh" default=15 min=5 max=120 unit=min group="Weather & Air"',
             '# @config wtext text "Custom descriptions" default="" group="Weather & Air" help="Big face. Up to 24 custom descriptions, comma separated, in state order"',
+            '# @config maref number "Meteoalarm refresh" default=10 min=5 max=120 unit=min group="Weather & Air" help="How often to fetch the IMGW alert"',
+            '# @config madur slider "Message duration" default=15 min=5 max=120 unit=s group="Weather & Air" help="How long the Meteoalarm message is shown"',
+            '# @config mafreq slider "Frequency during the alert" default=10 min=1 max=240 unit=min group="Weather & Air" help="How often to show the message while the alert is active"',
+            '# @config mafreqb slider "Frequency before the alert" default=60 min=1 max=240 unit=min group="Weather & Air" help="How often to show the message before the alert starts"',
             '# @config rtopic text "MQTT: Room temperature" default="" group="Room" help="On the broker set in AWTRIX settings. Empty uses the clock sensor"',
             '# @config htopic text "MQTT: Humidity" default="" group="Room" help="On the broker set in AWTRIX settings. Empty uses the clock sensor"',
             '# @config rcol color "Room temperature color" default=#FFFFFF group="Room"',
@@ -201,7 +206,7 @@ LANG = {
     },
     "de": {
         "name": "NimbusDE",
-        "desc": "Uhr mit Kalender, Wetter, PM2.5-Luftqualität und Raumwerten",
+        "desc": "Uhr mit Kalender, Wetter, PM2.5-Luftqualität, Raumwerten und Meteoalarm-Wetterwarnungen",
         "hub": "",
         "meteo": False,
         "week3": "SONMONDIEMITDONFRISAM",
@@ -245,7 +250,8 @@ LANG = {
             '# @config rpan bool "6. Raum" default=true group="Karussell" help="Nummer 6 im Reihenfolge-Feld"',
             '# @config hpan bool "7. Luftfeuchte" default=true group="Karussell" help="Nummer 7 im Reihenfolge-Feld"',
             '# @config moon bool "8. Mondphase" default=true group="Karussell" help="Nummer 8 im Reihenfolge-Feld"',
-            '# @config order text "Reihenfolge (Nummern)" default="" group="Karussell" help="Panelnummern durch Kommas getrennt, z. B. 1,2,3,4,5,6,7,8. Leer = Standardreihenfolge"',
+            '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Karussell" help="Nummer 9 im Reihenfolge-Feld"',
+            '# @config order text "Reihenfolge (Nummern)" default="" group="Karussell" help="Panelnummern durch Kommas getrennt, z. B. 1,2,3,4,5,6,7,8,9. Leer = Standardreihenfolge"',
             '# @config ddur slider "Dauer des Datums" default=10 min=1 max=60 unit=s group="Karussell"',
             '# @config pdur slider "Dauer der anderen Panels" default=3 min=1 max=60 unit=s group="Karussell"',
             '# @config wdur slider "Dauer des Wetter-Panels" default=10 min=1 max=60 unit=s group="Karussell" help="Mehr Zeit, um die scrollende Wetterbeschreibung unter dem Symbol zu lesen"',
@@ -256,6 +262,10 @@ LANG = {
             '# @config lon number "Längengrad" default=2.3522 min=-180 max=180 step=0.0001 group="Wetter & Luft"',
             '# @config wref number "Aktualisierung" default=15 min=5 max=120 unit=min group="Wetter & Luft"',
             '# @config wtext text "Eigene Beschreibungen" default="" group="Wetter & Luft" help="Großes Zifferblatt. Bis zu 24 eigene Beschreibungen, Komma-getrennt"',
+            '# @config maref number "Meteoalarm-Aktualisierung" default=10 min=5 max=120 unit=min group="Wetter & Luft" help="Wie oft der IMGW-Alarm abgerufen wird"',
+            '# @config madur slider "Dauer der Meldung" default=15 min=5 max=120 unit=s group="Wetter & Luft" help="Wie lange die Meteoalarm-Meldung angezeigt wird"',
+            '# @config mafreq slider "Häufigkeit während des Alarms" default=10 min=1 max=240 unit=min group="Wetter & Luft" help="Wie oft die Meldung bei aktivem Alarm angezeigt wird"',
+            '# @config mafreqb slider "Häufigkeit vor dem Alarm" default=60 min=1 max=240 unit=min group="Wetter & Luft" help="Wie oft die Meldung vor Alarmbeginn angezeigt wird"',
             '# @config rtopic text "MQTT: Raumtemperatur" default="" group="Raum" help="Auf dem Broker aus den AWTRIX-Einstellungen. Leer nutzt den Uhr-Sensor"',
             '# @config htopic text "MQTT: Luftfeuchte" default="" group="Raum" help="Auf dem Broker aus den AWTRIX-Einstellungen. Leer nutzt den Uhr-Sensor"',
             '# @config rcol color "Farbe der Raumtemperatur" default=#FFFFFF group="Raum"',
@@ -272,7 +282,7 @@ LANG = {
     },
     "es": {
         "name": "NimbusES",
-        "desc": "Reloj con calendario, tiempo, calidad del aire PM2.5 y valores de la habitación",
+        "desc": "Reloj con calendario, tiempo, calidad del aire PM2.5, valores de la habitación y avisos Meteoalarm",
         "hub": "",
         "meteo": False,
         "week3": "DOMLUNMARMIEJUEVIESAB",
@@ -316,7 +326,8 @@ LANG = {
             '# @config rpan bool "6. Habitación" default=true group="Carrusel" help="Número 6 en el campo de orden"',
             '# @config hpan bool "7. Humedad" default=true group="Carrusel" help="Número 7 en el campo de orden"',
             '# @config moon bool "8. Fase lunar" default=true group="Carrusel" help="Número 8 en el campo de orden"',
-            '# @config order text "Orden (números)" default="" group="Carrusel" help="Números de paneles separados por comas, p. ej. 1,2,3,4,5,6,7,8. Vacío = orden predeterminado"',
+            '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carrusel" help="Número 9 en el campo de orden"',
+            '# @config order text "Orden (números)" default="" group="Carrusel" help="Números de paneles separados por comas, p. ej. 1,2,3,4,5,6,7,8,9. Vacío = orden predeterminado"',
             '# @config ddur slider "Duración de la fecha" default=10 min=1 max=60 unit=s group="Carrusel"',
             '# @config pdur slider "Duración de otros paneles" default=3 min=1 max=60 unit=s group="Carrusel"',
             '# @config wdur slider "Duración del panel del tiempo" default=10 min=1 max=60 unit=s group="Carrusel" help="Más tiempo para leer la descripción deslizante del tiempo bajo el icono"',
@@ -327,6 +338,10 @@ LANG = {
             '# @config lon number "Longitud" default=2.3522 min=-180 max=180 step=0.0001 group="Tiempo y Aire"',
             '# @config wref number "Actualización" default=15 min=5 max=120 unit=min group="Tiempo y Aire"',
             '# @config wtext text "Descripciones propias" default="" group="Tiempo y Aire" help="Esfera grande. Hasta 24 descripciones propias, separadas por comas"',
+            '# @config maref number "Actualización de Meteoalarm" default=10 min=5 max=120 unit=min group="Tiempo y Aire" help="Cada cuántos minutos obtener la alerta IMGW"',
+            '# @config madur slider "Duración del mensaje" default=15 min=5 max=120 unit=s group="Tiempo y Aire" help="Cuánto tiempo se muestra el mensaje de Meteoalarm"',
+            '# @config mafreq slider "Frecuencia durante la alerta" default=10 min=1 max=240 unit=min group="Tiempo y Aire" help="Cada cuántos minutos mostrar el mensaje durante la alerta"',
+            '# @config mafreqb slider "Frecuencia antes de la alerta" default=60 min=1 max=240 unit=min group="Tiempo y Aire" help="Cada cuántos minutos mostrar el mensaje antes del inicio"',
             '# @config rtopic text "MQTT: Temperatura de la habitación" default="" group="Habitación" help="En el broker de los ajustes de AWTRIX. Vacío usa el sensor del reloj"',
             '# @config htopic text "MQTT: Humedad" default="" group="Habitación" help="En el broker de los ajustes de AWTRIX. Vacío usa el sensor del reloj"',
             '# @config rcol color "Color de la temperatura" default=#FFFFFF group="Habitación"',
@@ -343,7 +358,7 @@ LANG = {
     },
     "pt": {
         "name": "NimbusPT",
-        "desc": "Relógio com calendário, tempo, qualidade do ar PM2.5 e valores do quarto",
+        "desc": "Relógio com calendário, tempo, qualidade do ar PM2.5, valores do quarto e avisos Meteoalarm",
         "hub": "",
         "meteo": False,
         "week3": "DOMSEGTERQUAQUISEXSAB",
@@ -387,7 +402,8 @@ LANG = {
             '# @config rpan bool "6. Quarto" default=true group="Carrossel" help="Número 6 no campo de ordem"',
             '# @config hpan bool "7. Humidade" default=true group="Carrossel" help="Número 7 no campo de ordem"',
             '# @config moon bool "8. Fase da lua" default=true group="Carrossel" help="Número 8 no campo de ordem"',
-            '# @config order text "Ordem (números)" default="" group="Carrossel" help="Números dos painéis separados por vírgulas, ex.: 1,2,3,4,5,6,7,8. Vazio = ordem predefinida"',
+            '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carrossel" help="Número 9 no campo de ordem"',
+            '# @config order text "Ordem (números)" default="" group="Carrossel" help="Números dos painéis separados por vírgulas, ex.: 1,2,3,4,5,6,7,8,9. Vazio = ordem predefinida"',
             '# @config ddur slider "Duração da data" default=10 min=1 max=60 unit=s group="Carrossel"',
             '# @config pdur slider "Duração dos outros painéis" default=3 min=1 max=60 unit=s group="Carrossel"',
             '# @config wdur slider "Duração do painel do tempo" default=10 min=1 max=60 unit=s group="Carrossel" help="Mais tempo para ler a descrição deslizante do tempo sob o ícone"',
@@ -398,6 +414,10 @@ LANG = {
             '# @config lon number "Longitude" default=2.3522 min=-180 max=180 step=0.0001 group="Tempo e Ar"',
             '# @config wref number "Atualização" default=15 min=5 max=120 unit=min group="Tempo e Ar"',
             '# @config wtext text "Descrições próprias" default="" group="Tempo e Ar" help="Mostrador grande. Até 24 descrições próprias, separadas por vírgulas"',
+            '# @config maref number "Atualização do Meteoalarm" default=10 min=5 max=120 unit=min group="Tempo e Ar" help="Com que frequência obter o alerta IMGW"',
+            '# @config madur slider "Duração da mensagem" default=15 min=5 max=120 unit=s group="Tempo e Ar" help="Quanto tempo a mensagem do Meteoalarm é mostrada"',
+            '# @config mafreq slider "Frequência durante o alerta" default=10 min=1 max=240 unit=min group="Tempo e Ar" help="Com que frequência mostrar a mensagem durante o alerta"',
+            '# @config mafreqb slider "Frequência antes do alerta" default=60 min=1 max=240 unit=min group="Tempo e Ar" help="Com que frequência mostrar a mensagem antes do início"',
             '# @config rtopic text "MQTT: Temperatura do quarto" default="" group="Quarto" help="No broker das definições do AWTRIX. Vazio usa o sensor do relógio"',
             '# @config htopic text "MQTT: Humidade" default="" group="Quarto" help="No broker das definições do AWTRIX. Vazio usa o sensor do relógio"',
             '# @config rcol color "Cor da temperatura do quarto" default=#FFFFFF group="Quarto"',
@@ -417,54 +437,22 @@ LANG = {
 ORDER = ["PL", "en", "de", "es", "pt"]
 
 # ---------------------------------------------------------------------------
-# meteoalarm removal (non-Polish variants)
+# meteoalarm without TERYT (non-Polish variants)
 # ---------------------------------------------------------------------------
+# The feature stays, but the county-localization (the TERYT table and the
+# materyt option) is dropped: the app then shows the highest-level warning
+# from the whole-country IMGW feed.
 
-METEO_STRIP = [
-    # member variables
-    ("var r,aq,ar,ma1,maQ,maB,ma_enabled,ma_ref_rate,maText,maLvl,maCol,mc,maFrom,maTo,maMsg,maNext,maUntil,maDur,maFreq,maFreqB,mao,wao,maTeryt,moon_on,moonp,mo,mos,wind_on,wthr,w8prev",
-     "var r,aq,ar,wao,moon_on,moonp,mo,mos,wind_on,wthr,w8prev"),
-    ("var pmthr,p5prev,fg,fgh,showpm,pl", "var pmthr,p5prev,fg,fgh,showpm"),
-    # init
-    ("self.ma_enabled=store.get(\"meteoalarm_enabled\",false)", ""),
-    ("var rf=store.get(\"maref\")self.ma_ref_rate=(rf==nil?10:rf)*60 var md=store.get(\"madur\")self.maDur=(md==nil?15:md)*1000 var mf=store.get(\"mafreq\")self.maFreq=(mf==nil?10:mf)*60 var mb=store.get(\"mafreqb\")self.maFreqB=(mb==nil?60:mb)*60 ", ""),
-    ("self.wao={\"mode\":\"loop\",\"speed\":40,\"direction\":\"left\",\"gap\":28}self.mao={\"mode\":\"loop\",\"speed\":40,\"direction\":\"left\",\"gap\":10}",
-     "self.wao={\"mode\":\"loop\",\"speed\":40,\"direction\":\"left\",\"gap\":28}"),
-    ("var mt=store.get(\"materyt\")var mts=re.matchall(\"[0-9]+\",mt)self.maTeryt=size(mts)>0&&size(mts[0])==4?mts[0]:\"\" var la=store.get(\"lat\")var lo=store.get(\"lon\")if self.maTeryt==\"\"&&(la<49||la>55||lo<14||lo>24.5)self.ma_enabled=false end ", ""),
-    (" elif n==9&&self.ma_enabled a=6", ""),
-    (" elif n2==9&&self.ma_enabled a=6", ""),
-    ("self.pl={}self.pl[\"Ą\"]=self.v(\"./##./#.#/###/#.#/##.#\")self.pl[\"Ć\"]=self.v(\".#/.#/#.#/#/#.#/.#\")self.pl[\"Ę\"]=self.v(\"./###/#/###/#/###.#\")self.pl[\"Ł\"]=self.v(\"./#./#./##./#./###\")self.pl[\"Ń\"]=self.v(\".#/##./#.#/#.#/#.#/#.#\")self.pl[\"Ó\"]=self.v(\".#/.#/#.#/#.#/#.#/.#\")self.pl[\"Ś\"]=self.v(\".#/.##/#../.#./..#/##.\")self.pl[\"Ź\"]=self.v(\".#/###/..#/.#./#../###\")self.pl[\"Ż\"]=self.v(\".#./###/..#/.#./#../###\")", ""),
-    # loop
-    ("if self.maText!=nil var ns=self.mts()if self.maTo!=\"\"&&ns>=self.maTo self.maText=nil self.maMsg=\"\" self.maUntil=0 self.maNext=0 else var nw=now_ms()if self.maNext==0||nw>=self.maNext self.maUntil=nw+self.maDur self.maNext=nw+((self.maFrom==\"\"||ns>=self.maFrom)?self.maFreq*1000:self.maFreqB*1000)self.M=0 end end end ", ""),
-    ("if self.d==6&&(self.maText==nil||now_ms()>=self.maUntil)self.M=0 end ", ""),
-    ("var msg=self.maText!=nil&&self.maUntil>0&&now_ms()<self.maUntil var a=0 if msg var k6=self.c.find(6)if k6!=nil self.L=k6 a=6 end else ", "var a=0 "),
-    ("self.L=f end if a!=self.d", "self.L=f if a!=self.d"),
-    ("self.B-=1\n    self.maB-=1\n", "self.B-=1\n"),
-    ("\n    if self.ma_enabled && self.maB <= 0 && !self.maQ\n        self.maQ = true\n        self.maB = self.ma_ref_rate\n        http.get(self.ma1,/o,c->self.ma_cb(o,c))\n    end\n", "\n"),
-    # mok
-    ("def mok(i)\n  if i==6 return false end\n", "def mok(i)\n"),
-    # panel renderers
-    (" elif b==6 var t6=self.maText if t6==nil return end var u6=c<1?self.b(self.maCol,c):self.maCol if self.e<2 rect_fill(d,e,15,9,u6)if self.k==nil||(self.k>=50)==self.D scroll_text(d,e+7,15,\"METEOALARM\",0x000000,self.mao)end else rect_fill(d,e,15,16,u6)if self.k==nil||(self.k>=50)==self.D scroll_text(d,e+11,15,\"METEOALARM\",0x000000,self.mao)end end ",
-     " "),
-    (" elif b==6 var t6=self.maMsg if t6==nil return end var t6u=self.mup(t6)var u6=a<1?self.b(self.maCol,a):self.maCol var lw=self.E(\"METEOALARM\",self.a)+2 var total=lw+1+self.ma_w(t6u)+10 var off=int(now_ms()*40/1000)%total var lx=c+52-off rect_fill(lx,11,lw,5,u6)self.l(lx+1,11,\"METEOALARM\",self.a,0x000000)self.lm(lx+lw+1,11,t6u,u6,0,52) ",
-     " "),
-    # draw
-    ("var mv=self.maText!=nil&&l<self.maUntil ", ""),
-    ("a<2&&!mv&&self.d!=2&&self.d!=8", "a<2&&self.d!=2&&self.d!=8"),
-    ("if !o&&a<2&&mv scroll_text(0,15,52,self.maMsg,self.maCol,self.mao)end ", ""),
+METEO_NO_TERYT = [
+    ("var mt=store.get(\"materyt\")var mts=re.matchall(\"[0-9]+\",mt)self.maTeryt=size(mts)>0&&size(mts[0])==4?mts[0]:\"\" ", "self.maTeryt=\"\" "),
+    ("var la=store.get(\"lat\")var lo=store.get(\"lon\")if self.maTeryt==\"\"&&(la<49||la>55||lo<14||lo>24.5)self.ma_enabled=false end ", ""),
+    ("self.ma1=self.maTeryt!=\"\"?\"https://danepubliczne.imgw.pl/api/data/warningsmeteo/teryt/\"+self.maTeryt:\"https://danepubliczne.imgw.pl/api/data/warningsmeteo\"",
+     "self.ma1=\"https://danepubliczne.imgw.pl/api/data/warningsmeteo\""),
 ]
 
-METEO_STRIP_RE = [
-    # the TERYT county table and the IMGW URL / message state
+METEO_NO_TERYT_RE = [
+    # the TERYT county table
     (r"if self\.ma_enabled&&self\.maTeryt==\"\"[\s\S]*?self\.mc=nil end ", ""),
-    (r"self\.ma1=self\.maTeryt!=\"\"\?\"https://danepubliczne\.imgw\.pl/api/data/warningsmeteo/teryt/\"\+self\.maTeryt:\"https://danepubliczne\.imgw\.pl/api/data/warningsmeteo\"self\.maQ=false self\.maB=0 self\.maText=nil self\.maLvl=1 self\.maCol=0xFFC800 self\.maFrom=\"\" self\.maTo=\"\" self\.maMsg=\"\" self\.maNext=0 self\.maUntil=0 ", ""),
-    # helper functions used only by the meteoalarm message
-    (r"def lm\(c,f,e,h,w0,w1\)[^\n]*?return c end", ""),
-    (r"def ma_w\(s\)[^\n]*?return c end", ""),
-    (r"def mup\(s\)[^\n]*?return s end", ""),
-    (r"def mts\(\)[\s\S]*?\nend ", ""),
-    (r"def mdec\(s\)[\s\S]*?\nend ", ""),
-    (r"def ma_cb\(c,g\)[\s\S]*?\nend ", ""),
 ]
 
 
@@ -491,14 +479,12 @@ def build_one(tag, src):
     code = sub1(code,
                 '["CZYSTE NIEBO","CLEAR NIGHT","NOCHE DESPEJADA","NUIT CLAIRE","NOITE LIMPA","KLARE NACHT"][r==nil?0:r]',
                 '"%s"' % lang["night"], "night description")
-    # 3. meteoalarm removal for non-Polish variants
+    # 3. meteoalarm without the TERYT localization for non-Polish variants
     if not lang["meteo"]:
-        for old, new in METEO_STRIP:
-            code = sub1(code, old, new, "meteo strip: " + old[:40])
-        for pat, new in METEO_STRIP_RE:
-            code = sub_re(code, pat, new, "meteo strip re: " + pat[:40])
-    # the TERYT table is huge and multi-line; strip it (it is gone in non-PL anyway,
-    # but keep PL safe by removing it only there) - nothing to do for PL
+        for old, new in METEO_NO_TERYT:
+            code = sub1(code, old, new, "no-teryt strip: " + old[:40])
+        for pat, new in METEO_NO_TERYT_RE:
+            code = sub_re(code, pat, new, "no-teryt strip re: " + pat[:40])
     return head + "import math" + code
 
 
@@ -520,8 +506,8 @@ def smoke():
     run_dir = cache / "run"
     run_dir.mkdir(exist_ok=True)
     scenes = '''
-run_scene("kartka", 8, "SK", {"meteoalarm_enabled": false, "warm": true})
-run_scene("duży", 6, "SK2", {"meteoalarm_enabled": false, "warm": true})
+run_scene("kartka", 8, "SK", {"warm": true})
+run_scene("duży", 6, "SK2", {"warm": true})
 print("DONE")
 '''
     for tag in ORDER:
@@ -550,10 +536,13 @@ def main():
     for tag in ORDER:
         text = (ROOT / "dist" / ("nimbus-tc002-%s.ax" % ("PL" if tag == "PL" else tag))).read_text(encoding="utf-8")
         if tag == "PL":
-            assert "imgw" in text and "TERYT" in text and "maText" in text, "PL lost meteoalarm"
+            assert "imgw" in text and "materyt" in text and "maText" in text and "020123401540" in text, \
+                "PL lost meteoalarm"
         else:
-            for bad in ("imgw", "TERYT", "meteoalarm", "maText", "maMsg", "materyt", "maref", "mafreq"):
+            for bad in ("materyt", "TERYT", "020123401540"):
                 assert bad not in text, "%s still contains %s" % (tag, bad)
+            for good in ("imgw", "maText", "METEOALARM", "meteoalarm_enabled", "mafreq"):
+                assert good in text, "%s lost meteoalarm (%s)" % (tag, good)
         for bad in ("English", "Español", "Français", "Português", "Deutsch", "wlang"):
             assert bad not in text, "%s still contains %s" % (tag, bad)
     smoke()

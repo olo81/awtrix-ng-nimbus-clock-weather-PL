@@ -24,7 +24,7 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 
 - Aplikacja podzielona na **5 wersji językowych** w katalogu `dist/`: `nimbus-tc002-PL.ax` (polski), `nimbus-tc002-en.ax` (angielski), `nimbus-tc002-de.ax` (niemiecki), `nimbus-tc002-es.ax` (hiszpański) i `nimbus-tc002-pt.ax` (portugalski).
 - Każda wersja ma **menu, opisy pogody, dni tygodnia i miesiące we własnym języku** — selektor języka i pozostałe tłumaczenia zostały usunięte z kodu.
-- **Meteoalarm (IMGW) z tabelą powiatów TERYT jest tylko w wersji polskiej** — ostrzeżenia IMGW dotyczą wyłącznie Polski, więc wersje zagraniczne są odchudzone o cały ten mechanizm (mniejszy plik, mniej opcji).
+- **Wszystkie wersje mają Meteoalarm (IMGW)**. Wersja polska lokalizuje ostrzeżenia do powiatu (tabela TERYT, automatycznie ze współrzędnych), a wersje EN/DE/ES/PT działają **bez TERYT** — pokazują ostrzeżenie o najwyższym stopniu z całego kraju (mniejszy plik bez tabeli powiatów).
 
 ---
 
@@ -282,7 +282,7 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 
 ## ⚙️ Instrukcja Instalacji
 
-1. Pobierz plik z katalogu [`dist/`](./dist/) — wybierz wersję językową: **`nimbus-tc002-PL.ax`** (polski, z Meteoalarmem IMGW) lub `nimbus-tc002-en.ax` / `-de.ax` / `-es.ax` / `-pt.ax` (menu w danym języku, bez Meteoalarmu).
+1. Pobierz plik z katalogu [`dist/`](./dist/) — wybierz wersję językową: **`nimbus-tc002-PL.ax`** (polski, Meteoalarm z lokalizacją do powiatu) lub `nimbus-tc002-en.ax` / `-de.ax` / `-es.ax` / `-pt.ax` (menu w danym języku, Meteoalarm bez TERYT — najwyższy alert z całej Polski).
 2. Otwórz panel zarządzania zegarem AWTRIX w przeglądarce (wpisz adres IP zegara w sieci lokalnej).
 3. Przejdź do zakładki **Files** / **Apps** (lub połącz się przez FTP/Samba).
 4. Wgraj plik do katalogu `/apps/`.
