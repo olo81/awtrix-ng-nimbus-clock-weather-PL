@@ -4,10 +4,10 @@ Reads tests/nimbus-template.ax (the multi-language template that ships all six
 weather description lists and the Meteoalarm/TERYT machinery) and writes:
 
   dist/nimbus-tc002-PL.ax  - Polish UI, only Polish descriptions, Meteoalarm (IMGW)
-  dist/nimbus-tc002-en.ax  - English UI, no Meteoalarm/TERYT
-  dist/nimbus-tc002-de.ax  - German UI, no Meteoalarm/TERYT
-  dist/nimbus-tc002-es.ax  - Spanish UI, no Meteoalarm/TERYT
-  dist/nimbus-tc002-pt.ax  - Portuguese UI, no Meteoalarm/TERYT
+  dist/nimbus-tc002-en.ax  - English UI, Meteoalarm without TERYT
+  dist/nimbus-tc002-de.ax  - German UI, Meteoalarm without TERYT
+  dist/nimbus-tc002-es.ax  - Spanish UI, Meteoalarm without TERYT
+  dist/nimbus-tc002-pt.ax  - Portuguese UI, Meteoalarm without TERYT
 
 The non-Polish variants keep Meteoalarm but drop the TERYT county localization
 (the county table and the materyt option): they show the highest-level warning
@@ -24,7 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "tests" / "nimbus-template.ax"
-VERSION = "2.9.0"
+VERSION = "2.10.0"
 HELP_LIMIT = 96  # AWTRIX NG truncates @config help texts to 96 UTF-8 bytes
 
 
@@ -60,8 +60,9 @@ LANG = {
         "week6": ["NIEDZ", "PONIE", "WTORE", "SRODA", "CZWAR", "PIATE", "SOBOT"],
         "months3": "STYLUTMARKWIMAJCZELIPSIEWRZPAZLISGRU",
         "moon": ["NÓW", "SIERP", "I KWADRA", "GARB", "PEŁNIA", "GARB", "III KWADRA", "SIERP"],
+        "room": "POKÓJ",
         "night": "CZYSTE NIEBO",
-        "descs": ["SŁONECZNIE", "PRZEWAŻNIE SŁONECZNIE", "PRZELOTNE ZACHMURZENIE", "ZACHMURZENIE",
+        "descs": ["SŁONECZNIE", "PRZEWAŻNIE BEZCHMURNIE", "PRZELOTNE ZACHMURZENIE", "ZACHMURZENIE",
                   "MGŁA", "SZADŹ", "MŻAWKA", "SILNA MŻAWKA", "MŻAWKA MARZNĄCA", "SILNA MŻAWKA MARZNĄCA",
                   "DESZCZ", "ULEWA", "DESZCZ MARZNĄCY", "SILNY DESZCZ MARZNĄCY", "ŚNIEG", "ŚNIEŻYCA",
                   "KRUPA ŚNIEŻNA", "PRZELOTNY DESZCZ", "ULEWNY PRZELOTNY DESZCZ", "PRZELOTNY ŚNIEG",
@@ -94,11 +95,12 @@ LANG = {
             '# @config dpan bool "3. Data" default=true group="Karuzela" help="Numer 3 w polu kolejności"',
             '# @config tpan bool "4. Temperatura" default=true group="Karuzela" help="Numer 4 w polu kolejności"',
             '# @config showpm bool "5. PM2.5" default=true group="Karuzela" help="Numer 5 w polu kolejności"',
-            '# @config rpan bool "6. Pokój" default=true group="Karuzela" help="Numer 6 w polu kolejności"',
-            '# @config hpan bool "7. Wilgotność" default=true group="Karuzela" help="Numer 7 w polu kolejności"',
+            '# @config rpan bool "6. Temperatura w pokoju" default=true group="Karuzela" help="Numer 6 w polu kolejności"',
+            '# @config hpan bool "7. Wilgotność w pokoju" default=true group="Karuzela" help="Numer 7 w polu kolejności"',
             '# @config moon bool "8. Faza księżyca" default=true group="Karuzela" help="Numer 8 w polu kolejności"',
+            '# @config ppan bool "10. Ciśnienie" default=true group="Karuzela" help="Numer 10 w polu kolejności"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Karuzela" help="Numer 9 w polu kolejności"',
-            '# @config order text "Kolejność (numery)" default="" group="Karuzela" help="Numery paneli po przecinku, np. 1,2,3,4,5,6,7,8,9. Puste = kolejność domyślna"',
+            '# @config order text "Kolejność (numery)" default="" group="Karuzela" help="Numery paneli po przecinku, np. 1,2,3,4,5,6,7,8,9,10. Puste = kolejność domyślna"',
             '# @config ddur slider "Czas wyświetlania daty" default=10 min=1 max=60 unit=s group="Karuzela"',
             '# @config pdur slider "Czas pozostałych paneli" default=3 min=1 max=60 unit=s group="Karuzela"',
             '# @config wdur slider "Czas panelu pogody" default=10 min=1 max=60 unit=s group="Karuzela" help="Dłuższy czas na odczytanie przewijanego opisu pogody pod ikonką"',
@@ -109,6 +111,10 @@ LANG = {
             '# @config lon number "Długość geogr. (Lon)" default=2.3522 min=-180 max=180 step=0.0001 group="Pogoda i Powietrze"',
             '# @config wref number "Odświeżanie" default=15 min=5 max=120 unit=min group="Pogoda i Powietrze"',
             '# @config wtext text "Własne opisy" default="" group="Pogoda i Powietrze" help="Duża tarcza. Do 24 własnych opisów po przecinku, w kolejności stanów (noc ma stały opis)"',
+            '# @config ttopic text "MQTT: Temperatura zewnętrzna" default="" group="Pogoda i Powietrze" help="Nadpisuje dane z Open-Meteo/Airly. Puste = automatycznie"',
+            '# @config pmtopic text "MQTT: PM2.5" default="" group="Pogoda i Powietrze" help="Nadpisuje dane z Open-Meteo/Airly. Puste = automatycznie"',
+            '# @config airlykey text "Klucz API Airly" default="" group="Pogoda i Powietrze" help="Opcjonalny. Podany: temperatura i PM2.5 z Airly zamiast Open-Meteo"',
+            '# @config airlyref slider "Częstotliwość Airly" default=15 min=5 max=120 unit=min group="Pogoda i Powietrze" help="Jak często pobierać dane Airly. 15 minut jest optymalne dla darmowego konta"',
             '# @config materyt text "TERYT powiatu" default="" group="Pogoda i Powietrze" help="4-cyfrowy TERYT (np. 1465). Puste: auto ze współrzędnych. Kody: eteryt.stat.gov.pl"',
             '# @config maref number "Odświeżanie Meteoalarmu" default=10 min=5 max=120 unit=min group="Pogoda i Powietrze" help="Co ile minut pobierać alert IMGW"',
             '# @config madur slider "Czas komunikatu" default=15 min=5 max=120 unit=s group="Pogoda i Powietrze" help="Jak długo wyświetlać komunikat meteoalarmu"',
@@ -137,6 +143,7 @@ LANG = {
         "week6": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
         "months3": "JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC",
         "moon": ["NEW", "CRESCENT", "1ST QUARTER", "GIBBOUS", "FULL", "GIBBOUS", "3RD QUARTER", "CRESCENT"],
+        "room": "ROOM",
         "night": "CLEAR NIGHT",
         "descs": ["CLEAR", "MOSTLY CLEAR", "PARTLY CLOUDY", "OVERCAST", "FOG", "RIME", "DRIZZLE",
                   "HEAVY DRIZZLE", "FREEZING DRIZZLE", "HEAVY FREEZING DRIZZLE", "RAIN", "HEAVY RAIN",
@@ -171,11 +178,12 @@ LANG = {
             '# @config dpan bool "3. Date" default=true group="Carousel" help="Number 3 in the order field"',
             '# @config tpan bool "4. Temperature" default=true group="Carousel" help="Number 4 in the order field"',
             '# @config showpm bool "5. PM2.5" default=true group="Carousel" help="Number 5 in the order field"',
-            '# @config rpan bool "6. Room" default=true group="Carousel" help="Number 6 in the order field"',
-            '# @config hpan bool "7. Humidity" default=true group="Carousel" help="Number 7 in the order field"',
+            '# @config rpan bool "6. Room temperature" default=true group="Carousel" help="Number 6 in the order field"',
+            '# @config hpan bool "7. Room humidity" default=true group="Carousel" help="Number 7 in the order field"',
             '# @config moon bool "8. Moon phase" default=true group="Carousel" help="Number 8 in the order field"',
+            '# @config ppan bool "10. Pressure" default=true group="Carousel" help="Number 10 in the order field"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carousel" help="Number 9 in the order field"',
-            '# @config order text "Order (numbers)" default="" group="Carousel" help="Panel numbers separated by commas, e.g. 1,2,3,4,5,6,7,8,9. Empty = default order"',
+            '# @config order text "Order (numbers)" default="" group="Carousel" help="Panel numbers separated by commas, e.g. 1,2,3,4,5,6,7,8,9,10. Empty = default order"',
             '# @config ddur slider "Date duration" default=10 min=1 max=60 unit=s group="Carousel"',
             '# @config pdur slider "Other panels duration" default=3 min=1 max=60 unit=s group="Carousel"',
             '# @config wdur slider "Weather panel duration" default=10 min=1 max=60 unit=s group="Carousel" help="More time to read the scrolling weather description under the icon"',
@@ -186,6 +194,10 @@ LANG = {
             '# @config lon number "Longitude" default=2.3522 min=-180 max=180 step=0.0001 group="Weather & Air"',
             '# @config wref number "Refresh" default=15 min=5 max=120 unit=min group="Weather & Air"',
             '# @config wtext text "Custom descriptions" default="" group="Weather & Air" help="Big face. Up to 24 custom descriptions, comma separated, in state order"',
+            '# @config ttopic text "MQTT: Outside temperature" default="" group="Weather & Air" help="Overrides Open-Meteo/Airly. Empty = automatic"',
+            '# @config pmtopic text "MQTT: PM2.5" default="" group="Weather & Air" help="Overrides Open-Meteo/Airly. Empty = automatic"',
+            '# @config airlykey text "Airly API key" default="" group="Weather & Air" help="Optional. When set, temperature and PM2.5 come from Airly instead of Open-Meteo"',
+            '# @config airlyref slider "Airly refresh" default=15 min=5 max=120 unit=min group="Weather & Air" help="How often to fetch Airly data. 15 minutes is optimal for a free Airly account"',
             '# @config maref number "Meteoalarm refresh" default=10 min=5 max=120 unit=min group="Weather & Air" help="How often to fetch the IMGW alert"',
             '# @config madur slider "Message duration" default=15 min=5 max=120 unit=s group="Weather & Air" help="How long the Meteoalarm message is shown"',
             '# @config mafreq slider "Frequency during the alert" default=10 min=1 max=240 unit=min group="Weather & Air" help="How often to show the message while the alert is active"',
@@ -213,6 +225,7 @@ LANG = {
         "week6": ["SON", "MON", "DIE", "MIT", "DON", "FRE", "SAM"],
         "months3": "JANFEBMRZAPRMAIJUNJULAUGSEPOKTNOVDEZ",
         "moon": ["NEUMOND", "SICHEL", "1. VIERTEL", "ZUNEHMEND", "VOLLMOND", "ABNEHMEND", "3. VIERTEL", "SICHEL"],
+        "room": "RAUM",
         "night": "KLARE NACHT",
         "descs": ["KLAR", "MEIST KLAR", "HEITER", "BEDECKT", "NEBEL", "REIF", "NIESEL", "STARKER NIESEL",
                   "GEFRIERENDER NIESEL", "STARKER GEFRIERENDER NIESEL", "REGEN", "STARKREGEN",
@@ -247,11 +260,12 @@ LANG = {
             '# @config dpan bool "3. Datum" default=true group="Karussell" help="Nummer 3 im Reihenfolge-Feld"',
             '# @config tpan bool "4. Temperatur" default=true group="Karussell" help="Nummer 4 im Reihenfolge-Feld"',
             '# @config showpm bool "5. PM2.5" default=true group="Karussell" help="Nummer 5 im Reihenfolge-Feld"',
-            '# @config rpan bool "6. Raum" default=true group="Karussell" help="Nummer 6 im Reihenfolge-Feld"',
-            '# @config hpan bool "7. Luftfeuchte" default=true group="Karussell" help="Nummer 7 im Reihenfolge-Feld"',
+            '# @config rpan bool "6. Raumtemperatur" default=true group="Karussell" help="Nummer 6 im Reihenfolge-Feld"',
+            '# @config hpan bool "7. Raumluftfeuchte" default=true group="Karussell" help="Nummer 7 im Reihenfolge-Feld"',
             '# @config moon bool "8. Mondphase" default=true group="Karussell" help="Nummer 8 im Reihenfolge-Feld"',
+            '# @config ppan bool "10. Luftdruck" default=true group="Karussell" help="Nummer 10 im Reihenfolge-Feld"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Karussell" help="Nummer 9 im Reihenfolge-Feld"',
-            '# @config order text "Reihenfolge (Nummern)" default="" group="Karussell" help="Panelnummern durch Kommas getrennt, z. B. 1,2,3,4,5,6,7,8,9. Leer = Standardreihenfolge"',
+            '# @config order text "Reihenfolge (Nummern)" default="" group="Karussell" help="Panelnummern durch Kommas getrennt, z. B. 1,2,3,4,5,6,7,8,9,10. Leer = Standardreihenfolge"',
             '# @config ddur slider "Dauer des Datums" default=10 min=1 max=60 unit=s group="Karussell"',
             '# @config pdur slider "Dauer der anderen Panels" default=3 min=1 max=60 unit=s group="Karussell"',
             '# @config wdur slider "Dauer des Wetter-Panels" default=10 min=1 max=60 unit=s group="Karussell" help="Mehr Zeit, um die scrollende Wetterbeschreibung unter dem Symbol zu lesen"',
@@ -262,6 +276,10 @@ LANG = {
             '# @config lon number "Längengrad" default=2.3522 min=-180 max=180 step=0.0001 group="Wetter & Luft"',
             '# @config wref number "Aktualisierung" default=15 min=5 max=120 unit=min group="Wetter & Luft"',
             '# @config wtext text "Eigene Beschreibungen" default="" group="Wetter & Luft" help="Großes Zifferblatt. Bis zu 24 eigene Beschreibungen, Komma-getrennt"',
+            '# @config ttopic text "MQTT: Außentemperatur" default="" group="Wetter & Luft" help="Überschreibt Open-Meteo/Airly. Leer = automatisch"',
+            '# @config pmtopic text "MQTT: PM2.5" default="" group="Wetter & Luft" help="Überschreibt Open-Meteo/Airly. Leer = automatisch"',
+            '# @config airlykey text "Airly-API-Schlüssel" default="" group="Wetter & Luft" help="Optional. Wenn gesetzt, kommen Temperatur und PM2.5 von Airly statt von Open-Meteo"',
+            '# @config airlyref slider "Airly-Aktualisierung" default=15 min=5 max=120 unit=min group="Wetter & Luft" help="Wie oft Airly-Daten abrufen. 15 Minuten sind optimal für ein Gratis-Konto"',
             '# @config maref number "Meteoalarm-Aktualisierung" default=10 min=5 max=120 unit=min group="Wetter & Luft" help="Wie oft der IMGW-Alarm abgerufen wird"',
             '# @config madur slider "Dauer der Meldung" default=15 min=5 max=120 unit=s group="Wetter & Luft" help="Wie lange die Meteoalarm-Meldung angezeigt wird"',
             '# @config mafreq slider "Häufigkeit während des Alarms" default=10 min=1 max=240 unit=min group="Wetter & Luft" help="Wie oft die Meldung bei aktivem Alarm angezeigt wird"',
@@ -289,6 +307,7 @@ LANG = {
         "week6": ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"],
         "months3": "ENEFEBMARABRMAYJUNJULAGOSEPOCTNOVDIC",
         "moon": ["NUEVA", "CRECIENTE", "1ER CUARTO", "GIBOSA", "LLENA", "GIBOSA", "3ER CUARTO", "CRECIENTE"],
+        "room": "HABITACIÓN",
         "night": "NOCHE DESPEJADA",
         "descs": ["DESPEJADO", "MAYORMENTE DESPEJADO", "POCO NUBOSO", "CUBIERTO", "NIEBLA", "CENCELLADA",
                   "LLOVIZNA", "LLOVIZNA FUERTE", "LLOVIZNA HELADA", "LLOVIZNA HELADA FUERTE", "LLUVIA",
@@ -323,11 +342,12 @@ LANG = {
             '# @config dpan bool "3. Fecha" default=true group="Carrusel" help="Número 3 en el campo de orden"',
             '# @config tpan bool "4. Temperatura" default=true group="Carrusel" help="Número 4 en el campo de orden"',
             '# @config showpm bool "5. PM2.5" default=true group="Carrusel" help="Número 5 en el campo de orden"',
-            '# @config rpan bool "6. Habitación" default=true group="Carrusel" help="Número 6 en el campo de orden"',
-            '# @config hpan bool "7. Humedad" default=true group="Carrusel" help="Número 7 en el campo de orden"',
+            '# @config rpan bool "6. Temperatura de la habitación" default=true group="Carrusel" help="Número 6 en el campo de orden"',
+            '# @config hpan bool "7. Humedad de la habitación" default=true group="Carrusel" help="Número 7 en el campo de orden"',
             '# @config moon bool "8. Fase lunar" default=true group="Carrusel" help="Número 8 en el campo de orden"',
+            '# @config ppan bool "10. Presión" default=true group="Carrusel" help="Número 10 en el campo de orden"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carrusel" help="Número 9 en el campo de orden"',
-            '# @config order text "Orden (números)" default="" group="Carrusel" help="Números de paneles separados por comas, p. ej. 1,2,3,4,5,6,7,8,9. Vacío = orden predeterminado"',
+            '# @config order text "Orden (números)" default="" group="Carrusel" help="Números de paneles por comas, p. ej. 1,2,3,4,5,6,7,8,9,10. Vacío = orden predeterminado"',
             '# @config ddur slider "Duración de la fecha" default=10 min=1 max=60 unit=s group="Carrusel"',
             '# @config pdur slider "Duración de otros paneles" default=3 min=1 max=60 unit=s group="Carrusel"',
             '# @config wdur slider "Duración del panel del tiempo" default=10 min=1 max=60 unit=s group="Carrusel" help="Más tiempo para leer la descripción deslizante del tiempo bajo el icono"',
@@ -338,6 +358,10 @@ LANG = {
             '# @config lon number "Longitud" default=2.3522 min=-180 max=180 step=0.0001 group="Tiempo y Aire"',
             '# @config wref number "Actualización" default=15 min=5 max=120 unit=min group="Tiempo y Aire"',
             '# @config wtext text "Descripciones propias" default="" group="Tiempo y Aire" help="Esfera grande. Hasta 24 descripciones propias, separadas por comas"',
+            '# @config ttopic text "MQTT: Temperatura exterior" default="" group="Tiempo y Aire" help="Sustituye a Open-Meteo/Airly. Vacío = automático"',
+            '# @config pmtopic text "MQTT: PM2.5" default="" group="Tiempo y Aire" help="Sustituye a Open-Meteo/Airly. Vacío = automático"',
+            '# @config airlykey text "Clave API de Airly" default="" group="Tiempo y Aire" help="Opcional. Si se indica, temperatura y PM2.5 vienen de Airly en vez de Open-Meteo"',
+            '# @config airlyref slider "Actualización de Airly" default=15 min=5 max=120 unit=min group="Tiempo y Aire" help="Cada cuántos minutos obtener datos de Airly. 15 min es lo óptimo para una cuenta gratuita"',
             '# @config maref number "Actualización de Meteoalarm" default=10 min=5 max=120 unit=min group="Tiempo y Aire" help="Cada cuántos minutos obtener la alerta IMGW"',
             '# @config madur slider "Duración del mensaje" default=15 min=5 max=120 unit=s group="Tiempo y Aire" help="Cuánto tiempo se muestra el mensaje de Meteoalarm"',
             '# @config mafreq slider "Frecuencia durante la alerta" default=10 min=1 max=240 unit=min group="Tiempo y Aire" help="Cada cuántos minutos mostrar el mensaje durante la alerta"',
@@ -365,6 +389,7 @@ LANG = {
         "week6": ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"],
         "months3": "JANFEVMARABRMAIJUNJULAGOSETOUTNOVDEZ",
         "moon": ["NOVA", "CRESCENTE", "QUARTO CRES", "GIBOSA", "CHEIA", "GIBOSA", "QUARTO MIN", "CRESCENTE"],
+        "room": "QUARTO",
         "night": "NOITE LIMPA",
         "descs": ["LIMPO", "QUASE LIMPO", "NUBLADO", "ENCOBERTO", "NEVOEIRO", "SINCELO", "GAROA",
                   "GAROA FORTE", "GAROA GELADA", "GAROA GELADA FORTE", "CHUVA", "CHUVA FORTE",
@@ -399,11 +424,12 @@ LANG = {
             '# @config dpan bool "3. Data" default=true group="Carrossel" help="Número 3 no campo de ordem"',
             '# @config tpan bool "4. Temperatura" default=true group="Carrossel" help="Número 4 no campo de ordem"',
             '# @config showpm bool "5. PM2.5" default=true group="Carrossel" help="Número 5 no campo de ordem"',
-            '# @config rpan bool "6. Quarto" default=true group="Carrossel" help="Número 6 no campo de ordem"',
-            '# @config hpan bool "7. Humidade" default=true group="Carrossel" help="Número 7 no campo de ordem"',
+            '# @config rpan bool "6. Temperatura do quarto" default=true group="Carrossel" help="Número 6 no campo de ordem"',
+            '# @config hpan bool "7. Humidade do quarto" default=true group="Carrossel" help="Número 7 no campo de ordem"',
             '# @config moon bool "8. Fase da lua" default=true group="Carrossel" help="Número 8 no campo de ordem"',
+            '# @config ppan bool "10. Pressão" default=true group="Carrossel" help="Número 10 no campo de ordem"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carrossel" help="Número 9 no campo de ordem"',
-            '# @config order text "Ordem (números)" default="" group="Carrossel" help="Números dos painéis separados por vírgulas, ex.: 1,2,3,4,5,6,7,8,9. Vazio = ordem predefinida"',
+            '# @config order text "Ordem (números)" default="" group="Carrossel" help="Números dos painéis por vírgulas, ex.: 1,2,3,4,5,6,7,8,9,10. Vazio = ordem predefinida"',
             '# @config ddur slider "Duração da data" default=10 min=1 max=60 unit=s group="Carrossel"',
             '# @config pdur slider "Duração dos outros painéis" default=3 min=1 max=60 unit=s group="Carrossel"',
             '# @config wdur slider "Duração do painel do tempo" default=10 min=1 max=60 unit=s group="Carrossel" help="Mais tempo para ler a descrição deslizante do tempo sob o ícone"',
@@ -414,6 +440,10 @@ LANG = {
             '# @config lon number "Longitude" default=2.3522 min=-180 max=180 step=0.0001 group="Tempo e Ar"',
             '# @config wref number "Atualização" default=15 min=5 max=120 unit=min group="Tempo e Ar"',
             '# @config wtext text "Descrições próprias" default="" group="Tempo e Ar" help="Mostrador grande. Até 24 descrições próprias, separadas por vírgulas"',
+            '# @config ttopic text "MQTT: Temperatura exterior" default="" group="Tempo e Ar" help="Substitui o Open-Meteo/Airly. Vazio = automático"',
+            '# @config pmtopic text "MQTT: PM2.5" default="" group="Tempo e Ar" help="Substitui o Open-Meteo/Airly. Vazio = automático"',
+            '# @config airlykey text "Chave API da Airly" default="" group="Tempo e Ar" help="Opcional. Se indicada, temperatura e PM2.5 vêm da Airly em vez do Open-Meteo"',
+            '# @config airlyref slider "Atualização da Airly" default=15 min=5 max=120 unit=min group="Tempo e Ar" help="Com que frequência obter dados da Airly. 15 min é o ideal para uma conta gratuita"',
             '# @config maref number "Atualização do Meteoalarm" default=10 min=5 max=120 unit=min group="Tempo e Ar" help="Com que frequência obter o alerta IMGW"',
             '# @config madur slider "Duração da mensagem" default=15 min=5 max=120 unit=s group="Tempo e Ar" help="Quanto tempo a mensagem do Meteoalarm é mostrada"',
             '# @config mafreq slider "Frequência durante o alerta" default=10 min=1 max=240 unit=min group="Tempo e Ar" help="Com que frequência mostrar a mensagem durante o alerta"',
@@ -466,6 +496,10 @@ def build_one(tag, src):
     # 2. single-language code strings
     code = sub1(code, 'self.aa="NIEPONWTOSROCZWPIASOB"',
                 'self.aa="%s"' % lang["week3"], "weekday abbreviations")
+    # the room label on the room/humidity panels (sheet + big face)
+    n_room = code.count('"POKÓJ"')
+    assert n_room == 2, "room label: found %d" % n_room
+    code = code.replace('"POKÓJ"', '"%s"' % lang["room"])
     code = sub1(code, 'self.aa6=["NIEDZ","PONIE","WTORE","SRODA","CZWAR","PIATE","SOBOT"]',
                 'self.aa6=["%s"]' % '","'.join(lang["week6"]), "big-face weekday names")
     code = sub1(code, 'self.aM=\n"STYLUTMARKWIMAJCZELIPSIEWRZPAZLISGRU"',
@@ -545,6 +579,8 @@ def main():
                 assert good in text, "%s lost meteoalarm (%s)" % (tag, good)
         for bad in ("English", "Español", "Français", "Português", "Deutsch", "wlang"):
             assert bad not in text, "%s still contains %s" % (tag, bad)
+        for good in ("airly", "pressure_msl", "hPa", "ppan"):
+            assert good in text, "%s lost the %s feature" % (tag, good)
     smoke()
     print("OK")
 
