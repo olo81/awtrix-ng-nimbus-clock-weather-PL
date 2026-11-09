@@ -299,7 +299,7 @@ class _Store
       "chc": 0xFF0000, "ctc": 0x000000, "cbc": 0xFFFFFF, "wbar": true, "wmon": true,
       "wtd": 0xFFFFFF, "wod": 0x666666, "wtw": 0xFFFFFF, "wow": 0x666666,
       "tran": "przetarcie", "ddur": 2, "pdur": 2, "wdur": 2, "moon": true, "wind": true, "ppan": true,
-      "airlykey": "", "ttopic": "", "pmtopic": "", "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
+      "airlykey": "", "ttopic": "", "pmtopic": "", "dlpan": true, "dldur": 5, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
       "nauto": false, "nfrom": 22, "nto": 7, "nbar": true, "npause": false, "nbri": 0,
       "face": face, "canim": false, "dfmt": "dd.mm.yy", "showpm": true,
       "order": "", "lat": 52.23, "lon": 21.01,
@@ -412,17 +412,31 @@ var _WC = 2
 var _DAY = 1
 var _PM = 12.3
 var _WG = 25
+var _PRESS = 1013.2
 class _Http
   def get(url, cb, opts)
+    var body = ""
     if string.find(url, "imgw") >= 0
-      cb('[{"id":"Sk2","nazwa_zdarzenia":"' + _MAEV + '","stopien":"3","prawdopodobienstwo":"80","obowiazuje_do":"2026-11-04 10:00:00","obowiazuje_od":"2026-11-04 01:00:00","opublikowano":"2026-11-03 11:38:00","tresc":"x","komentarz":"Brak.","biuro":"y","teryt":["1465"]}]', 200)
+      body = '[{"id":"Sk2","nazwa_zdarzenia":"' + _MAEV + '","stopien":"3","prawdopodobienstwo":"80","obowiazuje_do":"2026-11-04 10:00:00","obowiazuje_od":"2026-11-04 01:00:00","opublikowano":"2026-11-03 11:38:00","tresc":"x","komentarz":"Brak.","biuro":"y","teryt":["1465"]}]'
     elif string.find(url, "air-quality") >= 0
-      cb('{"current":{"pm2_5":' + str(_PM) + '}}', 200)
+      body = '{"current":{"pm2_5":' + str(_PM) + '}}'
     elif string.find(url, "airly") >= 0
-      cb('{"current":{"values":[{"name":"PM25","value":55.0},{"name":"TEMPERATURE","value":25.5}]}}', 200)
+      body = '{"current":{"values":[{"name":"PM25","value":55.0},{"name":"TEMPERATURE","value":25.5}]}}'
     else
-      cb('{"current":{"temperature_2m":' + str(_TMP) + ',"weather_code":' + str(_WC) + ',"is_day":' + str(_DAY) + ',"wind_gusts_10m":' + str(_WG) + ',"pressure_msl":1013.2}}', 200)
+      body = '{"current":{"temperature_2m":' + str(_TMP) + ',"weather_code":' + str(_WC) + ',"is_day":' + str(_DAY) + ',"wind_gusts_10m":' + str(_WG) + ',"pressure_msl":' + str(_PRESS) + '},"daily":{"sunrise":["2026-11-04T06:24"],"sunset":["2026-11-04T16:49"]}}'
     end
+    # the firmware keeps only `keep` bytes from the `find` anchor
+    if opts != nil
+      var fnd = opts.find("find")
+      var kp = opts.find("keep")
+      if fnd != nil && kp != nil
+        var i2 = string.find(body, fnd)
+        if i2 >= 0
+          body = body[i2 .. i2 + kp - 1]
+        end
+      end
+    end
+    cb(body, 200)
   end
 end
 
@@ -459,6 +473,7 @@ def run_scene(face, seconds, marker, cfg)
   store.reset(face)
   _TMP = 21.5
   _MAEV = "Silny wiatr"
+  _PRESS = 1013.2
   if cfg != nil
     for k : cfg.keys()
       store.set(k, cfg[k])
@@ -479,6 +494,8 @@ def run_scene(face, seconds, marker, cfg)
     if mq != nil _MVAL = mq end
     var mt = cfg.find("pmtopic")
     if mt != nil _MTOPIC = mt else _MTOPIC = "" end
+    var pv = cfg.find("press")
+    if pv != nil _PRESS = pv end
   end
   var n = mk()
   n.init()
@@ -499,7 +516,7 @@ def run_scene(face, seconds, marker, cfg)
 end
 
 run_scene("kartka", 32, "S1", {"temp": -20.3})
-run_scene("duży", 18, "S2", nil)
+run_scene("duży", 24, "S2", nil)
 run_scene("kartka", 6, "S3", {
   "meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8,
   "wtext": "słonecznie,przeważnie bezchmurnie,ZACHMURZENIE Z PRZELOTNYMI OPADAMI,chmury,mgła,szadź,mżawka,silna mżawka,mżawka marznąca,silna mżawka marznąca,deszcz,ulewa,deszcz marznący,silny deszcz marznący,śnieg,śnieżyca,krupa śnieżna,przelotny deszcz,ulewny przelotny deszcz,przelotny śnieg,silny przelotny śnieg,burza,burza z gradem"
@@ -515,7 +532,7 @@ run_scene("kartka", 22, "S6", {
 })
 run_scene("kartka", 6, "S14", {
   "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false,
-  "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false, "warm": true, "pm25": 12
+  "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false, "ppan": false, "dlpan": false, "warm": true, "pm25": 12
 })
 run_scene("kartka", 4, "S7", {
   "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
@@ -527,10 +544,10 @@ run_scene("duży", 4, "S9", {
   "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
 })
 run_scene("kartka", 4, "S10", {
-  "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "showpm": true, "warm": true, "pm25": 100
+  "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "ppan": false, "dlpan": false, "showpm": true, "warm": true, "pm25": 100
 })
 run_scene("kartka", 4, "S11", {
-  "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "showpm": true, "warm": true, "pm25": 200
+  "meteoalarm_enabled": false, "order": "5", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "ppan": false, "dlpan": false, "showpm": true, "warm": true, "pm25": 200
 })
 run_scene("kartka", 8, "S12", {
   "meteoalarm_enabled": false, "moon": false, "warm": true, "windgust": 100, "wcode": 2,
@@ -538,16 +555,34 @@ run_scene("kartka", 8, "S12", {
 })
 run_scene("kartka", 5, "S13", {
   "meteoalarm_enabled": false, "wpan": true, "dpan": true, "wind": true, "tpan": false,
-  "showpm": false, "rpan": false, "hpan": false, "moon": false, "warm": true, "windgust": 85, "wthr": 90
+  "showpm": false, "rpan": false, "hpan": false, "moon": false, "ppan": false, "dlpan": false, "warm": true, "windgust": 85, "wthr": 90
 })
 run_scene("kartka", 6, "S16", {
   "meteoalarm_enabled": false, "airlykey": "TESTKEY", "order": "5", "wpan": false, "wind": false,
-  "dpan": false, "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false, "warm": true
+  "dpan": false, "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false, "ppan": false, "dlpan": false, "warm": true
 })
 run_scene("kartka", 6, "S17", {
   "meteoalarm_enabled": false, "airlykey": "TESTKEY", "order": "5", "wpan": false, "wind": false,
-  "dpan": false, "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false,
+  "dpan": false, "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false, "ppan": false, "dlpan": false,
   "pmtopic": "home/pm", "mval": 200, "warm": true
+})
+run_scene("kartka", 5, "S18", {
+  "meteoalarm_enabled": false, "order": "10", "wpan": false, "wind": false, "dpan": false,
+  "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false,
+  "dlpan": false, "ppan": true, "warm": true, "press": 990
+})
+run_scene("kartka", 5, "S19", {
+  "meteoalarm_enabled": false, "order": "10", "wpan": false, "wind": false, "dpan": false,
+  "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false,
+  "dlpan": false, "ppan": true, "warm": true, "press": 1030
+})
+run_scene("kartka", 5, "S20", {
+  "meteoalarm_enabled": false, "order": "11", "wpan": false, "wind": false, "dpan": false,
+  "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false,
+  "dlpan": true, "ppan": false, "warm": true
+})
+run_scene("długośćdnia", 6, "S21", {
+  "meteoalarm_enabled": false, "warm": true
 })
 var WC = [%s]
 var wi = 0
@@ -777,14 +812,16 @@ def check_weather_gifs(scenes):
     f = s6[humi[len(humi) // 2]]
     bluex = [x for y in range(9, 14) for x in range(16) if f[y * W + x] == 0x00AAFF]
     assert bluex and max(bluex) <= 11, "S6: humidity shows a doubled percent sign"
-    # pressure panel: value on top (row 2), hPa unit below (row 11), no other panel
-    # matches this pattern (the room panel has its label in row 1, the date has red)
+    # pressure panel: biomet green value + hPa unit on a black tile (rows 2-6 value,
+    # rows 3-7 unit in the harness), no other panel uses green text
     pre = [i for i, f in enumerate(s6)
-           if any(f[2 * W + x] == 0xFFFFFF for x in range(15))
-           and any(f[11 * W + x] == 0xFFFFFF for x in range(15))
-           and not any(f[1 * W + x] == 0xFFFFFF for x in range(15))
-           and not any(f[y * W + x] == 0xFF0000 for y in range(16) for x in range(15))]
-    assert pre, "S6: no pressure panel (value + hPa unit)"
+           if any(f[y * W + x] == 0x00FF00 for y in range(2, 8) for x in range(15))]
+    assert pre, "S6: no pressure panel (green biomet text)"
+    # day-length panel joins the default carousel: yellow value in the tile, no icon above
+    dl6 = [i for i, f in enumerate(s6)
+           if any(f[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(W))
+           and not any(f[y * W + x] in (0xFFC800, 0xFF7800) for y in range(1, 10) for x in range(15))]
+    assert dl6, "S6: no day-length panel"
     # face previews are non-empty
     for marker in ("S7", "S8", "S9"):
         assert any(scenes[marker][5]), "%s: empty preview frame" % marker
@@ -876,6 +913,52 @@ def check_weather_gifs(scenes):
     s17 = scenes["S17"]
     assert any(s17[i][y * W + x] == 0x0033AA for i in range(len(s17))
                for y in range(0, 16) for x in range(15)), "S17: MQTT PM2.5 (navy) not shown"
+    # pressure biomet: deep low (990) -> red text, high (1030) -> yellow text
+    s18 = scenes["S18"]
+    red18 = [i for i, f in enumerate(s18)
+             if any(f[y * W + x] == 0xFF0000 for y in range(3, 8) for x in range(15))
+             and not any(f[y * W + x] == 0xFF0000 for y in range(0, 2) for x in range(15))]
+    assert red18, "S18: no red biomet pressure"
+    assert not any(s18[i][y * W + x] == 0x00FF00 for i in range(len(s18))
+                   for y in range(0, 16) for x in range(15)), "S18: green biomet leaked"
+    s19 = scenes["S19"]
+    assert any(s19[i][y * W + x] == 0xFFFF00 for i in range(len(s19))
+               for y in range(2, 8) for x in range(15)), "S19: no yellow biomet pressure"
+    leak19 = [i for i, f in enumerate(s19)
+              if any(f[y * W + x] == 0xFF0000 for y in range(3, 8) for x in range(15))
+              and not any(f[y * W + x] == 0xFF0000 for y in range(0, 2) for x in range(15))]
+    assert not leak19, "S19: red biomet leaked"
+    # day-length carousel panel: yellow value in the tile, the 24h bar at the bottom
+    # and the week bar hidden while the panel is shown
+    s20 = scenes["S20"]
+    assert any(s20[i][y * W + x] == 0xC24CFF for i in range(len(s20))
+               for y in range(10, 15) for x in range(W)), "S20: no purple day-length value"
+    assert any(s20[i][y * W + x] == 0x505050 for i in range(len(s20))
+               for y in (15,) for x in range(W)), "S20: no gray 24h bar on the panel"
+    assert any(s20[i][y * W + x] == 0xFFC800 for i in range(len(s20))
+               for y in (15,) for x in range(W)), "S20: no yellow daylight segment on the panel"
+    f20 = s20[[i for i, f in enumerate(s20)
+               if any(f[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(W))
+               and any(f[y * W + x] == 0x505050 for y in (15,) for x in range(W))][0]]
+    assert not any(f20[15 * W + x] in (0xFFFFFF, 0x666666) for x in range(17, 51)), \
+        "S20: week bar visible during the day-length panel"
+    assert any(f20[y * W + x] == 0xFFFFFF for y in range(5, 10) for x in range(17, 35)), \
+        "S20: the hour is not full size during the day-length panel"
+    # the day-length face: gray 24h bar with a yellow sunrise-sunset segment, yellow
+    # day-length text at rows 8-12, no week bar, big white time
+    s21 = scenes["S21"]
+    assert any(s21[i][y * W + x] == 0x505050 for i in range(len(s21))
+               for y in (15,) for x in range(W)), "S21: no gray 24h bar"
+    assert any(s21[i][y * W + x] == 0xFFC800 for i in range(len(s21))
+               for y in (15,) for x in range(W)), "S21: no yellow daylight segment"
+    assert any(s21[i][y * W + x] == 0xC24CFF for i in range(len(s21))
+               for y in range(10, 15) for x in range(W)), "S21: no purple day-length value text"
+    assert not any(s21[5][15 * W + x] in (0xFFFFFF, 0x666666) for x in range(17, 51)), \
+        "S21: week bar visible on the day-length face"
+    assert any(s21[5][y * W + x] == 0xFFFFFF for y in range(0, 10) for x in range(W)), \
+        "S21: no full-size white time"
+    assert not any(s21[5][y * W + x] == 0xFFFFFF for y in range(10, 16) for x in range(W)), \
+        "S21: the hour overlaps the day-length value"
 
 
 def main():
@@ -897,7 +980,7 @@ def main():
         raise
     scenes = parse_frames(out)
     assert "S1" in scenes and "S2" in scenes and "S3" in scenes and "S4" in scenes and "S5" in scenes, (out[-500:])
-    assert all(k in scenes for k in ("S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17")), (out[-500:])
+    assert all(k in scenes for k in ("S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20", "S21")), (out[-500:])
     check_help_limits()
     checks(scenes)
     check_weather_gifs(scenes)
@@ -910,6 +993,7 @@ def main():
     render(scenes["S7"][5]).save(docs / "tc002-sheet.png")
     render(scenes["S8"][5]).save(docs / "tc002-ring.png")
     render(scenes["S9"][5]).save(docs / "tc002-big.png")
+    render(scenes["S21"][5]).save(docs / "tc002-day.png")
     for name in ("meteoalarm.gif", "meteoalarm-big.gif"):
         p = docs / name
         print("%s (%d frames, %d KB)" % (p, len(scenes["S1" if "big" not in name else "S2"]),
