@@ -24,7 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "tests" / "nimbus-template.ax"
-VERSION = "2.11.0"
+VERSION = "2.12.0"
 HELP_LIMIT = 96  # AWTRIX NG truncates @config help texts to 96 UTF-8 bytes
 
 
@@ -52,6 +52,8 @@ def sub_re(src, pattern, new, what):
 
 LANG = {
     "PL": {
+        "dl1": "DŁ.",
+        "dl2": "DNIA",
         "name": "NimbusPL",
         "desc": "Zegar z kalendarzem, pogodą, jakością powietrza PM, odczytami z pomieszczenia i ostrzeżeniami meteoalarm (IMGW)",
         "hub": "# @hub aCQWh4FpWLwK 4410930662c50393922093fa3ecc7adeb28f7d014c755028b7aa4cf066b660b4\n",
@@ -78,7 +80,6 @@ LANG = {
             '# @config tlz bool "Zero wiodące" default=true group="Czas"',
             '# @config tsep select "Dwukropek" options=stały,mrugający,pulsowanie default=pulsowanie group="Czas"',
             '# @config tcol color "Kolor godziny" default=#FFFFFF group="Czas"',
-            '# @config face select "Tarcza zegara" options=kartka,pierścień,duży,długośćdnia default=kartka group="Czas"',
             '# @config chc color "Kolor nagłówka" default=#FF0000 group="Kalendarz"',
             '# @config ctc color "Kolor tekstu" default=#000000 group="Kalendarz"',
             '# @config cbc color "Kolor tła" default=#FFFFFF group="Kalendarz"',
@@ -86,7 +87,7 @@ LANG = {
             '# @config dfmt select "Format daty" options=dd.mm.yy,mm/dd/yy,yy-mm-dd default=dd.mm.yy group="Kalendarz" help="Dla dużej tarczy"',
             '# @config wbar bool "Pasek tygodnia" default=true group="Pasek tygodnia"',
             '# @config wmon bool "Tydzień od poniedziałku" default=true group="Pasek tygodnia"',
-            '# @config wtd color "Dzisiaj" default=#FFFFFF group="Pasek tygodnia"',
+            '# @config wtd color "Dzisiaj" default=#FFC800 group="Pasek tygodnia"',
             '# @config wod color "Pozostałe dni robocze" default=#666666 group="Pasek tygodnia"',
             '# @config wtw color "Dzisiaj w weekend" default=#FFFFFF group="Pasek tygodnia"',
             '# @config wow color "Pozostałe dni weekendowe" default=#666666 group="Pasek tygodnia"',
@@ -100,7 +101,6 @@ LANG = {
             '# @config moon bool "8. Faza księżyca" default=true group="Karuzela" help="Numer 8 w polu kolejności"',
             '# @config ppan bool "10. Ciśnienie" default=true group="Karuzela" help="Numer 10 w polu kolejności"',
             '# @config dlpan bool "11. Długość dnia" default=true group="Karuzela" help="Numer 11 w polu kolejności"',
-            '# @config dldur slider "Czas długości dnia" default=5 min=1 max=60 unit=s group="Karuzela" help="Jak długo wyświetlać panel długości dnia\"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Karuzela" help="Numer 9 w polu kolejności"',
             '# @config order text "Kolejność (numery)" default="" group="Karuzela" help="Numery paneli po przecinku, np. 1,2,3,4,5,6,7,8,9,10,11. Puste = kolejność domyślna"',
             '# @config ddur slider "Czas wyświetlania daty" default=10 min=1 max=60 unit=s group="Karuzela"',
@@ -112,7 +112,7 @@ LANG = {
             '# @config lat number "Szerokość geogr. (Lat)" default=48.8566 min=-90 max=90 step=0.0001 group="Pogoda i Powietrze"',
             '# @config lon number "Długość geogr. (Lon)" default=2.3522 min=-180 max=180 step=0.0001 group="Pogoda i Powietrze"',
             '# @config wref number "Odświeżanie" default=15 min=5 max=120 unit=min group="Pogoda i Powietrze"',
-            '# @config wtext text "Własne opisy" default="" group="Pogoda i Powietrze" help="Duża tarcza. Do 24 własnych opisów po przecinku, w kolejności stanów (noc ma stały opis)"',
+            '# @config wtext text "Własne opisy" default="" group="Pogoda i Powietrze" help="Do 24 własnych opisów po przecinku, w kolejności stanów (noc ma stały opis)"',
             '# @config ttopic text "MQTT: Temperatura zewnętrzna" default="" group="Pogoda i Powietrze" help="Nadpisuje dane z Open-Meteo/Airly. Puste = automatycznie"',
             '# @config pmtopic text "MQTT: PM2.5" default="" group="Pogoda i Powietrze" help="Nadpisuje dane z Open-Meteo/Airly. Puste = automatycznie"',
             '# @config airlykey text "Klucz API Airly" default="" group="Pogoda i Powietrze" help="Opcjonalny. Podany: temperatura i PM2.5 z Airly zamiast Open-Meteo"',
@@ -126,17 +126,11 @@ LANG = {
             '# @config htopic text "MQTT: Wilgotność" default="" group="Pokój" help="Na brokerze z ustawień AWTRIX. Puste używa czujnika zegara"',
             '# @config rcol color "Kolor temperatury w pokoju" default=#FFFFFF group="Pokój"',
             '# @config hcol color "Kolor wilgotności" default=#00AAFF group="Pokój"',
-            '# @config night bool "Tryb nocny" default=false group="Tryb nocny"',
-            '# @config nauto bool "Automatyczny tryb nocny" default=false group="Tryb nocny" help="Pomiędzy poniższymi godzinami"',
-            '# @config nfrom number "Od godziny" default=22 min=0 max=23 unit=h group="Tryb nocny"',
-            '# @config nto number "Do godziny" default=7 min=0 max=23 unit=h group="Tryb nocny"',
-            '# @config nbar bool "Pasek tygodnia w nocy" default=true group="Tryb nocny"',
-            '# @config npause bool "Wstrzymaj rotację w nocy" default=false group="Tryb nocny"',
-            '# @config nbri number "Jasność nocna" default=0 min=0 max=255 group="Tryb nocny" help="0 zachowuje jasność urządzenia; inna wartość ustawi jasność na noc"',
-            '# @config ntopic text "MQTT Topic trybu nocnego" default="" group="Tryb nocny" help="Payload: on/off, true/false lub 1/0"',
         ],
     },
     "en": {
+        "dl1": "DAY",
+        "dl2": "LEN",
         "name": "NimbusEN",
         "desc": "Clock with calendar, weather, PM2.5 air quality, room values and Meteoalarm weather warnings",
         "hub": "",
@@ -163,7 +157,6 @@ LANG = {
             '# @config tlz bool "Leading zero" default=true group="Time"',
             '# @config tsep select "Colon" options=steady,blink,pulse default=pulse group="Time"',
             '# @config tcol color "Time color" default=#FFFFFF group="Time"',
-            '# @config face select "Clock face" options=sheet,ring,big,daylight default=sheet group="Time"',
             '# @config chc color "Header color" default=#FF0000 group="Calendar"',
             '# @config ctc color "Text color" default=#000000 group="Calendar"',
             '# @config cbc color "Background color" default=#FFFFFF group="Calendar"',
@@ -171,7 +164,7 @@ LANG = {
             '# @config dfmt select "Date format" options=dd.mm.yy,mm/dd/yy,yy-mm-dd default=dd.mm.yy group="Calendar" help="For the big face"',
             '# @config wbar bool "Week bar" default=true group="Week bar"',
             '# @config wmon bool "Week starts Monday" default=true group="Week bar"',
-            '# @config wtd color "Today" default=#FFFFFF group="Week bar"',
+            '# @config wtd color "Today" default=#FFC800 group="Week bar"',
             '# @config wod color "Other weekdays" default=#666666 group="Week bar"',
             '# @config wtw color "Today on a weekend" default=#FFFFFF group="Week bar"',
             '# @config wow color "Other weekend days" default=#666666 group="Week bar"',
@@ -185,7 +178,6 @@ LANG = {
             '# @config moon bool "8. Moon phase" default=true group="Carousel" help="Number 8 in the order field"',
             '# @config ppan bool "10. Pressure" default=true group="Carousel" help="Number 10 in the order field"',
             '# @config dlpan bool "11. Day length" default=true group="Carousel" help="Number 11 in the order field"',
-            '# @config dldur slider "Day length duration" default=5 min=1 max=60 unit=s group="Carousel" help="How long the day length panel is shown\"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carousel" help="Number 9 in the order field"',
             '# @config order text "Order (numbers)" default="" group="Carousel" help="Panel numbers separated by commas, e.g. 1,2,3,4,5,6,7,8,9,10,11. Empty = default order"',
             '# @config ddur slider "Date duration" default=10 min=1 max=60 unit=s group="Carousel"',
@@ -210,17 +202,11 @@ LANG = {
             '# @config htopic text "MQTT: Humidity" default="" group="Room" help="On the broker set in AWTRIX settings. Empty uses the clock sensor"',
             '# @config rcol color "Room temperature color" default=#FFFFFF group="Room"',
             '# @config hcol color "Humidity color" default=#00AAFF group="Room"',
-            '# @config night bool "Night mode" default=false group="Night mode"',
-            '# @config nauto bool "Automatic night mode" default=false group="Night mode" help="Between the hours below"',
-            '# @config nfrom number "From hour" default=22 min=0 max=23 unit=h group="Night mode"',
-            '# @config nto number "Until hour" default=7 min=0 max=23 unit=h group="Night mode"',
-            '# @config nbar bool "Week bar at night" default=true group="Night mode"',
-            '# @config npause bool "Pause rotation at night" default=false group="Night mode"',
-            '# @config nbri number "Night brightness" default=0 min=0 max=255 group="Night mode" help="0 keeps the device brightness; any other value sets the night brightness"',
-            '# @config ntopic text "MQTT Topic for night mode" default="" group="Night mode" help="Payload: on/off, true/false or 1/0"',
         ],
     },
     "de": {
+        "dl1": "TAG",
+        "dl2": "DAU.",
         "name": "NimbusDE",
         "desc": "Uhr mit Kalender, Wetter, PM2.5-Luftqualität, Raumwerten und Meteoalarm-Wetterwarnungen",
         "hub": "",
@@ -247,7 +233,6 @@ LANG = {
             '# @config tlz bool "Führende Null" default=true group="Zeit"',
             '# @config tsep select "Doppelpunkt" options=steady,blink,pulse default=pulse group="Zeit"',
             '# @config tcol color "Farbe der Uhrzeit" default=#FFFFFF group="Zeit"',
-            '# @config face select "Zifferblatt" options=sheet,ring,big,daylight default=sheet group="Zeit"',
             '# @config chc color "Farbe der Kopfzeile" default=#FF0000 group="Kalender"',
             '# @config ctc color "Textfarbe" default=#000000 group="Kalender"',
             '# @config cbc color "Hintergrundfarbe" default=#FFFFFF group="Kalender"',
@@ -255,7 +240,7 @@ LANG = {
             '# @config dfmt select "Datumsformat" options=dd.mm.yy,mm/dd/yy,yy-mm-dd default=dd.mm.yy group="Kalender" help="Für das große Zifferblatt"',
             '# @config wbar bool "Wochenleiste" default=true group="Wochenleiste"',
             '# @config wmon bool "Woche beginnt Montag" default=true group="Wochenleiste"',
-            '# @config wtd color "Heute" default=#FFFFFF group="Wochenleiste"',
+            '# @config wtd color "Heute" default=#FFC800 group="Wochenleiste"',
             '# @config wod color "Andere Werktage" default=#666666 group="Wochenleiste"',
             '# @config wtw color "Heute am Wochenende" default=#FFFFFF group="Wochenleiste"',
             '# @config wow color "Andere Wochenendtage" default=#666666 group="Wochenleiste"',
@@ -269,7 +254,6 @@ LANG = {
             '# @config moon bool "8. Mondphase" default=true group="Karussell" help="Nummer 8 im Reihenfolge-Feld"',
             '# @config ppan bool "10. Luftdruck" default=true group="Karussell" help="Nummer 10 im Reihenfolge-Feld"',
             '# @config dlpan bool "11. Tageslänge" default=true group="Karussell" help="Nummer 11 im Reihenfolge-Feld"',
-            '# @config dldur slider "Dauer der Tageslänge" default=5 min=1 max=60 unit=s group="Karussell" help="Wie lange das Tageslänge-Panel angezeigt wird\"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Karussell" help="Nummer 9 im Reihenfolge-Feld"',
             '# @config order text "Reihenfolge (Nummern)" default="" group="Karussell" help="Panelnummern durch Kommas getrennt, z. B. 1,2,3,4,5,6,7,8,9,10,11. Leer = Standardreihenfolge"',
             '# @config ddur slider "Dauer des Datums" default=10 min=1 max=60 unit=s group="Karussell"',
@@ -294,17 +278,11 @@ LANG = {
             '# @config htopic text "MQTT: Luftfeuchte" default="" group="Raum" help="Auf dem Broker aus den AWTRIX-Einstellungen. Leer nutzt den Uhr-Sensor"',
             '# @config rcol color "Farbe der Raumtemperatur" default=#FFFFFF group="Raum"',
             '# @config hcol color "Farbe der Luftfeuchte" default=#00AAFF group="Raum"',
-            '# @config night bool "Nachtmodus" default=false group="Nachtmodus"',
-            '# @config nauto bool "Automatischer Nachtmodus" default=false group="Nachtmodus" help="Zwischen den unten angegebenen Stunden"',
-            '# @config nfrom number "Von Stunde" default=22 min=0 max=23 unit=h group="Nachtmodus"',
-            '# @config nto number "Bis Stunde" default=7 min=0 max=23 unit=h group="Nachtmodus"',
-            '# @config nbar bool "Wochenleiste nachts" default=true group="Nachtmodus"',
-            '# @config npause bool "Rotation nachts pausieren" default=false group="Nachtmodus"',
-            '# @config nbri number "Nacht-Helligkeit" default=0 min=0 max=255 group="Nachtmodus" help="0 behält die Gerätehelligkeit bei; ein anderer Wert setzt die Helligkeit für die Nacht"',
-            '# @config ntopic text "MQTT-Topic für den Nachtmodus" default="" group="Nachtmodus" help="Payload: on/off, true/false oder 1/0"',
         ],
     },
     "es": {
+        "dl1": "DIA",
+        "dl2": "DUR.",
         "name": "NimbusES",
         "desc": "Reloj con calendario, tiempo, calidad del aire PM2.5, valores de la habitación y avisos Meteoalarm",
         "hub": "",
@@ -331,7 +309,6 @@ LANG = {
             '# @config tlz bool "Cero a la izquierda" default=true group="Hora"',
             '# @config tsep select "Dos puntos" options=steady,blink,pulse default=pulse group="Hora"',
             '# @config tcol color "Color de la hora" default=#FFFFFF group="Hora"',
-            '# @config face select "Esfera del reloj" options=sheet,ring,big,daylight default=sheet group="Hora"',
             '# @config chc color "Color del encabezado" default=#FF0000 group="Calendario"',
             '# @config ctc color "Color del texto" default=#000000 group="Calendario"',
             '# @config cbc color "Color de fondo" default=#FFFFFF group="Calendario"',
@@ -339,7 +316,7 @@ LANG = {
             '# @config dfmt select "Formato de fecha" options=dd.mm.yy,mm/dd/yy,yy-mm-dd default=dd.mm.yy group="Calendario" help="Para la esfera grande"',
             '# @config wbar bool "Barra semanal" default=true group="Barra semanal"',
             '# @config wmon bool "La semana empieza el lunes" default=true group="Barra semanal"',
-            '# @config wtd color "Hoy" default=#FFFFFF group="Barra semanal"',
+            '# @config wtd color "Hoy" default=#FFC800 group="Barra semanal"',
             '# @config wod color "Otros días laborables" default=#666666 group="Barra semanal"',
             '# @config wtw color "Hoy en fin de semana" default=#FFFFFF group="Barra semanal"',
             '# @config wow color "Otros días de fin de semana" default=#666666 group="Barra semanal"',
@@ -353,7 +330,6 @@ LANG = {
             '# @config moon bool "8. Fase lunar" default=true group="Carrusel" help="Número 8 en el campo de orden"',
             '# @config ppan bool "10. Presión" default=true group="Carrusel" help="Número 10 en el campo de orden"',
             '# @config dlpan bool "11. Duración del día" default=true group="Carrusel" help="Número 11 en el campo de orden"',
-            '# @config dldur slider "Duración del panel día" default=5 min=1 max=60 unit=s group="Carrusel" help="Cuánto tiempo se muestra el panel de duración del día\"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carrusel" help="Número 9 en el campo de orden"',
             '# @config order text "Orden (números)" default="" group="Carrusel" help="Números de paneles por comas, p. ej. 1,2,3,4,5,6,7,8,9,10,11. Vacío = orden predeterminado"',
             '# @config ddur slider "Duración de la fecha" default=10 min=1 max=60 unit=s group="Carrusel"',
@@ -378,17 +354,11 @@ LANG = {
             '# @config htopic text "MQTT: Humedad" default="" group="Habitación" help="En el broker de los ajustes de AWTRIX. Vacío usa el sensor del reloj"',
             '# @config rcol color "Color de la temperatura" default=#FFFFFF group="Habitación"',
             '# @config hcol color "Color de la humedad" default=#00AAFF group="Habitación"',
-            '# @config night bool "Modo nocturno" default=false group="Modo nocturno"',
-            '# @config nauto bool "Modo nocturno automático" default=false group="Modo nocturno" help="Entre las horas indicadas abajo"',
-            '# @config nfrom number "Desde la hora" default=22 min=0 max=23 unit=h group="Modo nocturno"',
-            '# @config nto number "Hasta la hora" default=7 min=0 max=23 unit=h group="Modo nocturno"',
-            '# @config nbar bool "Barra semanal de noche" default=true group="Modo nocturno"',
-            '# @config npause bool "Pausar la rotación de noche" default=false group="Modo nocturno"',
-            '# @config nbri number "Brillo nocturno" default=0 min=0 max=255 group="Modo nocturno" help="0 mantiene el brillo del dispositivo; otro valor fija el brillo nocturno"',
-            '# @config ntopic text "Topic MQTT del modo nocturno" default="" group="Modo nocturno" help="Payload: on/off, true/false o 1/0"',
         ],
     },
     "pt": {
+        "dl1": "DIA",
+        "dl2": "DUR.",
         "name": "NimbusPT",
         "desc": "Relógio com calendário, tempo, qualidade do ar PM2.5, valores do quarto e avisos Meteoalarm",
         "hub": "",
@@ -415,7 +385,6 @@ LANG = {
             '# @config tlz bool "Zero à esquerda" default=true group="Hora"',
             '# @config tsep select "Dois pontos" options=steady,blink,pulse default=pulse group="Hora"',
             '# @config tcol color "Cor da hora" default=#FFFFFF group="Hora"',
-            '# @config face select "Mostrador do relógio" options=sheet,ring,big,daylight default=sheet group="Hora"',
             '# @config chc color "Cor do cabeçalho" default=#FF0000 group="Calendário"',
             '# @config ctc color "Cor do texto" default=#000000 group="Calendário"',
             '# @config cbc color "Cor de fundo" default=#FFFFFF group="Calendário"',
@@ -423,7 +392,7 @@ LANG = {
             '# @config dfmt select "Formato da data" options=dd.mm.yy,mm/dd/yy,yy-mm-dd default=dd.mm.yy group="Calendário" help="Para o mostrador grande"',
             '# @config wbar bool "Barra semanal" default=true group="Barra semanal"',
             '# @config wmon bool "Semana começa na segunda" default=true group="Barra semanal"',
-            '# @config wtd color "Hoje" default=#FFFFFF group="Barra semanal"',
+            '# @config wtd color "Hoje" default=#FFC800 group="Barra semanal"',
             '# @config wod color "Outros dias úteis" default=#666666 group="Barra semanal"',
             '# @config wtw color "Hoje no fim de semana" default=#FFFFFF group="Barra semanal"',
             '# @config wow color "Outros dias de fim de semana" default=#666666 group="Barra semanal"',
@@ -437,7 +406,6 @@ LANG = {
             '# @config moon bool "8. Fase da lua" default=true group="Carrossel" help="Número 8 no campo de ordem"',
             '# @config ppan bool "10. Pressão" default=true group="Carrossel" help="Número 10 no campo de ordem"',
             '# @config dlpan bool "11. Duração do dia" default=true group="Carrossel" help="Número 11 no campo de ordem"',
-            '# @config dldur slider "Duração do painel do dia" default=5 min=1 max=60 unit=s group="Carrossel" help="Por quanto tempo o painel de duração do dia é mostrado\"',
             '# @config meteoalarm_enabled bool "9. Meteoalarm" default=false group="Carrossel" help="Número 9 no campo de ordem"',
             '# @config order text "Ordem (números)" default="" group="Carrossel" help="Números dos painéis por vírgulas, ex.: 1,2,3,4,5,6,7,8,9,10,11. Vazio = ordem predefinida"',
             '# @config ddur slider "Duração da data" default=10 min=1 max=60 unit=s group="Carrossel"',
@@ -462,14 +430,6 @@ LANG = {
             '# @config htopic text "MQTT: Humidade" default="" group="Quarto" help="No broker das definições do AWTRIX. Vazio usa o sensor do relógio"',
             '# @config rcol color "Cor da temperatura do quarto" default=#FFFFFF group="Quarto"',
             '# @config hcol color "Cor da humidade" default=#00AAFF group="Quarto"',
-            '# @config night bool "Modo noturno" default=false group="Modo noturno"',
-            '# @config nauto bool "Modo noturno automático" default=false group="Modo noturno" help="Entre as horas abaixo"',
-            '# @config nfrom number "Da hora" default=22 min=0 max=23 unit=h group="Modo noturno"',
-            '# @config nto number "Até à hora" default=7 min=0 max=23 unit=h group="Modo noturno"',
-            '# @config nbar bool "Barra semanal à noite" default=true group="Modo noturno"',
-            '# @config npause bool "Pausar a rotação à noite" default=false group="Modo noturno"',
-            '# @config nbri number "Brilho noturno" default=0 min=0 max=255 group="Modo noturno" help="0 mantém o brilho do dispositivo; outro valor define o brilho noturno"',
-            '# @config ntopic text "Tópico MQTT do modo noturno" default="" group="Modo noturno" help="Payload: on/off, true/false ou 1/0"',
         ],
     },
 }
@@ -510,6 +470,8 @@ def build_one(tag, src):
     n_room = code.count('"POKÓJ"')
     assert n_room == 2, "room label: found %d" % n_room
     code = code.replace('"POKÓJ"', '"%s"' % lang["room"])
+    code = sub1(code, 'self.dl1="DŁ."self.dl2="NDIA"',
+                'self.dl1="%s"self.dl2="%s"' % (lang["dl1"], lang["dl2"]), "day-length labels")
     code = sub1(code, 'self.aa6=["NIEDZ","PONIE","WTORE","SRODA","CZWAR","PIATE","SOBOT"]',
                 'self.aa6=["%s"]' % '","'.join(lang["week6"]), "big-face weekday names")
     code = sub1(code, 'self.aM=\n"STYLUTMARKWIMAJCZELIPSIEWRZPAZLISGRU"',
@@ -551,7 +513,7 @@ def smoke():
     run_dir.mkdir(exist_ok=True)
     scenes = '''
 run_scene("kartka", 8, "SK", {"warm": true})
-run_scene("duży", 6, "SK2", {"warm": true})
+run_scene("kartka", 6, "SK2", {"warm": true})
 print("DONE")
 '''
     for tag in ORDER:

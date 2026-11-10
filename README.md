@@ -1,7 +1,7 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-[![Version](https://img.shields.io/badge/version-2.11.0%20PL-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-2.12.0%20PL-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -18,6 +18,27 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 
 ---
 
+## 🆕 Nowości w v2.12.0 PL
+
+### 🎯 Uproszczenie: jedna tarcza, bez trybu nocnego
+
+- Została **tylko tarcza `kartka`** — wybór tarczy zniknął z opcji (pierścień, duży i długośćdnia tylko mieszały). Aplikacja jest dzięki temu prostsza i mniejsza.
+- **Usunięty tryb nocny** i wszystkie jego opcje (jasność nocna, godziny, pauza rotacji, MQTT) — zbędny przy jednej tarczy.
+
+### 🌅 Nowy kafelek `11. Długość dnia`
+
+- W kafelku (miejsce karuzeli) pojawia się **zielony napis `DŁ.`** (z kropką) i pod nim **żółty `DNIA`**, a niżej, od **lewej krawędzi**, wartość w formacie **`11h 25min`** — **cyfry fioletowe**, `h` i `min` **niebieskie**, małe litery, zwięzłe odstępy.
+- Na dolnym 1-pikselowym pasku 24 h (szary, z żółtym odcinkiem wschód–zachód słońca) jest **czerwona kropka 1 px** pokazująca **aktualną godzinę na osi dnia**.
+- Suwak `Czas długości dnia` usunięty — karta trwa tyle, co pozostałe panele.
+
+### 🟡 Drobne poprawki
+
+- **Pasek tygodnia**: dzisiejszy dzień jest domyślnie **żółty** (lepiej się wyróżnia).
+- **Kafelki pokoju**: etykieta `POKÓJ` jest **statyczna** (mniejsza czcionka, bez przewijania) z **naprzemiennymi literami czerwonymi i żółtymi** — czytelna na pierwszy rzut oka.
+- Komunikat meteoalarmu na kartce renderuje teraz **wielkie polskie litery** (Ą, Ę, Ł…) — wcześniej znikały.
+
+---
+
 ## 🆕 Nowości w v2.11.0 PL
 
 ### ⛅ Biomet ciśnienia (zielony / żółty / czerwony)
@@ -28,17 +49,10 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
   - 🔴 **Czerwony** — głęboki niż (poniżej 995 hPa), bardzo silny wyż (powyżej 1035 hPa) albo gwałtowne skoki (ponad 8 hPa/dobę): bóle głowy, migreny, rozdrażnienie.
 - **Wartość i jednostka `hPa` są w kolorze biometu, tło czarne**, a między wartością a jednostką jest **odstęp 1 piksela**. Aplikacja zbiera historię ciśnienia (przy każdym odświeżeniu pogody) i liczy zmianę z ostatnich 24 godzin.
 
-### 🌅 Nowa tarcza: `długość dnia`
-
-- W opcji **`Tarcza zegara`** doszła czwarta tarcza — **`długość dnia`**: **duża godzina u góry (pełna wysokość)**, a **na dole, na całą szerokość, 1-pikselowy pasek 24 godzin** — od północy (lewy brzeg) do północy (prawy brzeg).
-- Pasek jest **szary**, a **odcinek od wschodu do zachodu słońca świeci się na żółto** (dane `sunrise`/`sunset` z Open-Meteo w Twojej strefie czasowej).
-- Pod godziną wyświetla się **długość dnia w godzinach na fioletowo** (np. `6:25 h` — mała litera, z odstępem = 6 godzin i 25 minut), więc odróżnia się od żółtego odcinka paska. **Pasek dni tygodnia jest na tej tarczy ukryty.** Komunikat meteoalarmu pojawia się w miejscu wartości.
-
 ### ☀️ Panel karuzeli `11. Długość dnia`
 
-- Nowy panel **`11. Długość dnia`** pokazuje długość dnia w godzinach (**fioletowe cyfry**, np. `10:25 h` — mała litera, z odstępem; statycznie, bez przewijania) na pozostałych tarczach.
-- Na tarczach `kartka`/`pierścień` wartość pojawia się **na dole, na całą szerokość** (jak na tarczy `duży`), **godzina zostaje pełnowymiarowa** — wartość schodzi niżej, więc nic nie nachodzi na siebie. Dodatkowo **pasek 24 h** (1 piksel, szary, z żółtym odcinkiem od wschodu do zachodu słońca), a **pasek dni tygodnia jest ukryty**.
-- Ma **własny przełącznik** (grupa *Karuzela*) oraz **suwak `Czas długości dnia`** (1–60 s, domyślnie 5 s) — tyle trwa jego karta w rotacji.
+- Nowy panel **`11. Długość dnia`** pokazuje długość dnia w godzinach (**fioletowe cyfry**, statycznie, bez przewijania) z **1-pikselowym paskiem 24 h** na dole (szary, z żółtym odcinkiem wschód–zachód słońca) i **ukrytym paskiem dni tygodnia**.
+- Panel ma **własny przełącznik** (grupa *Karuzela*).
 
 ---
 
@@ -56,7 +70,7 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 
 ### 🏠 Etykiety `POKÓJ` i opis pogody
 
-- Karty **temperatury i wilgotności z pokoju** mają teraz przewijaną etykietę **`POKÓJ`** — od razu widać, że to odczyty z pomieszczenia, a nie z zewnątrz. W opcjach uściślono też nazwy paneli: *Temperatura w pokoju* / *Wilgotność w pokoju*.
+- Karty **temperatury i wilgotności z pokoju** mają etykietę **`POKÓJ`** (od v2.12.0 statyczną, bez przewijania, w gradiencie żółty→czerwony po literach) — od razu widać, że to odczyty z pomieszczenia, a nie z zewnątrz. W opcjach uściślono też nazwy paneli: *Temperatura w pokoju* / *Wilgotność w pokoju*.
 - Stan pogody `1` nazywa się teraz **`PRZEWAŻNIE BEZCHMURNIE`** zamiast *przeważnie słonecznie* — pasuje również w nocy.
 
 ---
@@ -204,16 +218,10 @@ Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z O
 - **Czas wyświetlania komunikatu** ustawiany suwakiem (5–120 s).
 - Alert **przejmuje pole karuzeli tylko na czas komunikatu** — po jego zakończeniu karuzela wraca sama.
 
-Na tarczy **kartka** / **pierścień** alert wygląda tak (kafelek `METEOALARM` u góry, komunikat na całą szerokość pod zegarem, pasek dni schowany na czas komunikatu):
+Alert wygląda tak: kafelek `METEOALARM` u góry, komunikat na całą szerokość pod zegarem, pasek dni tygodnia schowany na czas komunikatu:
 
 <p align="center">
   <img src="docs/meteoalarm.gif" alt="Meteoalarm na tarczy kartka" width="450">
-</p>
-
-Na tarczy **duży** alert pojawia się jako przewijany pasek: czarny napis `METEOALARM` na tle w kolorze zagrożenia, a obok niego **komunikat w kolorze zagrożenia** — przesuwają się razem:
-
-<p align="center">
-  <img src="docs/meteoalarm-big.gif" alt="Meteoalarm na tarczy duży" width="450">
 </p>
 
 ### ⌚ Pozostałe zmiany
@@ -224,16 +232,13 @@ Na tarczy **duży** alert pojawia się jako przewijany pasek: czarny napis `METE
 
 ---
 
-## 🎨 Tarcze Zegara (Style Wyglądu)
+## 🎨 Tarcza Zegara
 
-Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfiguracyjnym:
+Aplikacja ma **jedną tarczę — `kartka`** (bez wyboru w opcjach):
 
-| Podgląd | Nazwa w opcjach | Opis |
-| :---: | :---: | :--- |
-| <img src="docs/tc002-sheet.png" width="160"> | `kartka` | **Klasyczna kartka z kalendarza** z animowanym "zrywaniem" kartki, godziną przy górnej krawędzi i miejscem pod nią na komunikaty. |
-| <img src="docs/tc002-ring.png" width="160"> | `pierścień` | **Nowoczesna tarcza cyfrowa** otoczona płynnie obracającym się pierścieniem sekundnika. |
-| <img src="docs/tc002-big.png" width="160"> | `duży` | **Duży zegar na pełną szerokość** matrycy z 5-literowym dniem tygodnia, przewijanym u dołu tekstem daty, opisem pogody i alertami meteoalarmu. |
-| <img src="docs/tc002-day.png" width="160"> | `długośćdnia` | **Długość dnia**: duża godzina u góry, fioletowa długość dnia pod nią (np. `6:25 h`) i szary 1-pikselowy pasek 24 h z żółtym odcinkiem wschód–zachód słońca. Bez paska dni tygodnia. |
+| Podgląd | Opis |
+| :---: | :--- |
+| <img src="docs/tc002-sheet.png" width="160"> | **Klasyczna kartka z kalendarza** z animowanym "zrywaniem" kartki, godziną przy górnej krawędzi i kafelkiem karuzeli po lewej stronie. |
 
 ---
 
@@ -243,7 +248,7 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 2. Aplikacja bierze współrzędne `Lat`/`Lon` (te same, których używa Open-Meteo) i dopasowuje do nich **najbliższy powiat** z wbudowanej tabeli 380 powiatów (kod TERYT + środek). Jeśli chcesz wymusić konkretny powiat, wpisz jego 4-cyfrowy kod w polu **`TERYT powiatu`** (np. `1465` dla Warszawy). Kody powiatów znajdziesz w wyszukiwarce GUS: [eteryt.stat.gov.pl](https://eteryt.stat.gov.pl/).
 3. Co `Odświeżanie Meteoalarmu` (domyślnie 10 min) aplikacja odpytuje API IMGW o ostrzeżenia dla tego powiatu.
 4. Gdy jest aktywne ostrzeżenie, co `Częstotliwość w trakcie zagrożenia` (domyślnie 10 min) wyświetla komunikat; gdy ostrzeżenie jeszcze nie obowiązuje — co `Częstotliwość przed zagrożeniem` (domyślnie 60 min).
-5. Komunikat (długość ustawia `Czas komunikatu`) **przejmuje pole karuzeli**: na tarczy kartka/pierścień pojawia się kafelek `METEOALARM` + tekst na całej szerokości pod zegarem (pasek dni tygodnia jest wtedy schowany), a na tarczy duży — przewijany pasek `METEOALARM` z komunikatem w miejscu linii daty.
+5. Komunikat (długość ustawia `Czas komunikatu`) **przejmuje pole karuzeli**: pojawia się kafelek `METEOALARM` + tekst na całej szerokości pod zegarem (pasek dni tygodnia jest wtedy schowany).
 6. Po zakończeniu komunikatu karuzela wraca do normalnego działania.
 
 > ℹ️ **Dlaczego podpowiedzi w panelu są krótkie?** AWTRIX NG ucina teksty pomocy (`help`) do 96 znaków i nie renderuje w nich linków — to limit firmware, którego aplikacja nie może obejść. Pełne opisy, linki i instrukcje znajdziesz w tym README (oraz na stronie aplikacji w AWTRIX Hub).
@@ -317,7 +322,7 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
 | <img src="docs/weather-burza-z-silnym-gradem.gif" width="200"><br>Burza z silnym gradem | | |
 
 ### 3. ⛅ Ciśnienie Atmosferyczne i Biomet
-- Panel karuzeli **`Ciśnienie`** — wartość `pressure_msl` z Open-Meteo z **jednostką `hPa`** (odstęp 1 piksela; na dużej tarczy obok wartości).
+- Panel karuzeli **`Ciśnienie`** — wartość `pressure_msl` z Open-Meteo z **jednostką `hPa`** (odstęp 1 piksela).
 - **Biomet**: wartość i jednostka mają kolor zależny od wpływu ciśnienia na samopoczucie (wartość + zmiana z 24 h):
 
 | Warunek | Kolor | Biomet |
@@ -334,10 +339,9 @@ Aplikacja oferuje 3 unikalne warianty tarczy zegara do wyboru w panelu konfigura
   2. **Airly** — po podaniu `Klucza API Airly` (api.airly.eu); częstotliwość ustawia `Częstotliwość Airly` (domyślnie 15 min — optymalne dla darmowego konta).
   3. **Open-Meteo** — domyślne źródło, gdy powyższe są puste.
 
-### 5. 🌅 Długość Dnia (Tarcza i Panel)
-- **Tarcza `długość dnia`**: duża godzina u góry + fioletowa długość dnia pod nią (np. `6:25 h`) oraz szary 1-pikselowy pasek 24 h na dole (od północy do północy) z **żółtym odcinkiem od wschodu do zachodu słońca** (dane `sunrise`/`sunset` z Open-Meteo).
-- Na tej tarczy **pasek dni tygodnia jest ukryty**, a komunikat meteoalarmu pojawia się w miejscu wartości.
-- **Panel `11. Długość dnia`** (przełącznik + suwak `Czas długości dnia`) pokazuje to samo na pozostałych tarczach.
+### 5. 🌅 Długość Dnia (Panel 11)
+- **Panel `11. Długość dnia`** (własny przełącznik): w kafelku **zielony `DŁ.`** i **żółty `DNIA`**, pod spodem wartość od lewej krawędzi, np. **`11h 25min`** — cyfry fioletowe, `h` i `min` niebieskie, małe litery, zwięzłe odstępy — a na dole **1-pikselowy pasek 24 h**: szary, z **żółtym odcinkiem od wschodu do zachodu słońca** (dane `sunrise`/`sunset` z Open-Meteo) i **czerwoną kropką 1 px** pokazującą aktualną godzinę na osi dnia.
+- Na czas karty **pasek dni tygodnia jest ukryty**.
 
 ### 6. 🧹 Efekt "Wycieraczki" (Ochrona Matrycy LED)
 - Co dokładnie 5 minut przez ekran przesuwa się płynny, czarny pas czyszczący (800 ms).
@@ -376,7 +380,7 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | `8` | Faza księżyca | Aktualna faza księżyca — ikonka na czarnym tle |
 | `9` | Meteoalarm | Ostrzeżenia Meteoalarm/IMGW (kafelek `METEOALARM` lub przewijany pasek `METEOALARM` z komunikatem) |
 | `10` | Ciśnienie | Ciśnienie z Open-Meteo z **biometem** — wartość i `hPa` w kolorze biometu (zielony/żółty/czerwony) |
-| `11` | Długość dnia | Długość dnia w godzinach na dole ekranu (fioletowe cyfry, np. `10:25 h`, statycznie) + 1-pikselowy pasek 24 h (dni tygodnia ukryte) — czas karty ustawisz suwakiem |
+| `11` | Długość dnia | Kafelek `DŁ.` (zielony) + `DNIA` (żółty) + wartość `11h 25min` od lewej krawędzi (cyfry fioletowe, `h`/`min` niebieskie) + pasek 24 h z czerwoną kropką 1 px aktualnej godziny (dni tygodnia ukryte) |
 
 **Kolejność ustalasz w polu `Kolejność (numery)`** — wpisujesz numery po przecinku, np.:
 
@@ -402,12 +406,12 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `Zero wiodące` | `tak` | Wyświetlanie godziny np. jako `08:00` zamiast `8:00` |
 | | `Dwukropek` | `pulsowanie` | Tryby: `stały`, `mrugający`, `pulsowanie` |
 | | `Kolor godziny` | `#FFFFFF` | Główny kolor cyfr zegara |
-| | `Tarcza zegara` | `kartka` | Wybór stylu: `kartka`, `pierścień`, `duży`, `długośćdnia` |
 | **Kalendarz** | `Nagłówek`, `Tekst`, `Tło` | — | Kolorystyka kartki kalendarza |
 | | `Animacja kalendarza` | `tak` | Zrywanie kartki przy przełączaniu i o północy |
-| | `Format daty` | `dd.mm.yy` | Format daty na dużej tarczy (`dd.mm.yy`, `mm/dd/yy`, `yy-mm-dd`) |
+| | `Format daty` | `dd.mm.yy` | Format daty na kartce kalendarza (`dd.mm.yy`, `mm/dd/yy`, `yy-mm-dd`) |
 | **Pasek tygodnia** | `Pasek tygodnia` | `tak` | Pasek z 7 kropkami na dole ekranu |
 | | `Tydzień od poniedziałku` | `tak` | Rozpoczynanie tygodnia od Poniedziałku zamiast Niedzieli |
+| | `Dzisiaj` / `Dzisiaj w weekend` | `żółty` | Kolor dzisiejszego dnia — domyślnie żółty, lepiej się wyróżnia |
 | **Karuzela** | `1. Pogoda` | `tak` | Panel numer 1 w polu kolejności |
 | | `2. Porywy wiatru` | `tak` | Panel numer 2; pojawia się powyżej progu porywów |
 | | `3. Data` | `tak` | Panel numer 3 |
@@ -418,8 +422,7 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `8. Faza księżyca` | `tak` | Panel numer 8 |
 | | `9. Meteoalarm` | `nie` | Panel numer 9 (ostrzeżenia IMGW) |
 | | `10. Ciśnienie` | `tak` | Panel numer 10 (hPa z biometem) |
-| | `11. Długość dnia` | `tak` | Panel numer 11 (długość dnia w godzinach) |
-| | `Czas długości dnia` | `5 s` | Jak długo wyświetlać panel długości dnia (1–60 s) |
+| | `11. Długość dnia` | `tak` | Panel numer 11 (kafelek `DŁ.`/`DNIA`, wartość `11h 25min`, pasek 24 h z czerwoną kropką) |
 | | `Kolejność (numery)` | *(puste)* | Numery paneli po przecinku, np. `1,2,3,4,5,6,7,8,9,10,11`; puste = domyślna |
 | | `Czas daty`, `Czas paneli` | `10s / 3s` | Czas wyświetlania daty oraz pozostałych paneli |
 | | `Czas panelu pogody` | `10 s` | Osobny czas panelu pogody (ikonka + przewijany opis) |
@@ -432,8 +435,7 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `Częstotliwość Airly` | `15 min` | Co ile minut pobierać dane Airly (5–120); 15 minut jest optymalne dla darmowego konta |
 | | `MQTT: Temperatura zewnętrzna` | *(puste)* | Nadpisuje temperaturę z Open-Meteo/Airly; puste = automatycznie |
 | | `MQTT: PM2.5` | *(puste)* | Nadpisuje PM2.5 z Open-Meteo/Airly; puste = automatycznie |
-| | `Opisy pogody` | `Polski` | Język opisów dla dużej tarczy |
-| | `Własne opisy` | *(puste)* | Duża tarcza. Do 16 opisów po przecinku, w kolejności stanów z tabeli powyżej (noc ma stały opis) |
+| | `Własne opisy` | *(puste)* | Do 24 własnych opisów pogody po przecinku, w kolejności stanów z tabeli powyżej |
 | | `Włącz Meteoalarm` | `nie` | Ostrzeżenia IMGW dla powiatu wyznaczonego ze współrzędnych |
 | | `TERYT powiatu` | *(puste)* | Ręczny 4-cyfrowy kod TERYT powiatu (np. `1465` = Warszawa); puste = automatycznie ze współrzędnych. Lista kodów: eteryt.stat.gov.pl |
 | | `Odświeżanie Meteoalarmu` | `10 min` | Co ile minut pobierać alert z API IMGW |
@@ -441,7 +443,6 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `Częstotliwość w trakcie zagrożenia` | `10 min` | Co ile minut pokazywać komunikat, gdy ostrzeżenie obowiązuje |
 | | `Częstotliwość przed zagrożeniem` | `60 min` | Co ile minut pokazywać komunikat, zanim ostrzeżenie się rozpocznie |
 | **Pokój** | `MQTT Topics` | — | Ścieżki MQTT dla temperatury i wilgotności z Home Assistant |
-| **Tryb nocny** | `Automatyczny tryb nocny` | `nie` | Automatyczne przyciemnienie i wstrzymanie rotacji w wybranych godzinach |
 
 ---
 

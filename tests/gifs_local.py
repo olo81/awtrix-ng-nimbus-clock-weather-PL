@@ -174,7 +174,26 @@ def overlay(n) end
 def icon(n, x, y) return true end
 def font(n) end
 def rgb(r, g, b) return (r << 16) | (g << 8) | b end
-def hsv(h, s, v) return 0xFFFFFF end
+def hsv(h, s, v)
+  var sv2 = v * s / 100.0
+  var hf = h / 60.0
+  var i2 = int(hf)
+  while i2 >= 6 i2 -= 6 end
+  while i2 < 0 i2 += 6 end
+  var f2 = hf - int(hf)
+  var p2 = v * 1.0 - sv2
+  var q2 = v * 1.0 - sv2 * f2
+  var t2 = v * 1.0 - sv2 * (1.0 - f2)
+  var r2 = 0 var g2 = 0 var b2 = 0
+  if i2 == 0 r2 = v g2 = t2 b2 = p2
+  elif i2 == 1 r2 = q2 g2 = v b2 = p2
+  elif i2 == 2 r2 = p2 g2 = v b2 = t2
+  elif i2 == 3 r2 = p2 g2 = q2 b2 = v
+  elif i2 == 4 r2 = t2 g2 = p2 b2 = v
+  else r2 = v g2 = p2 b2 = q2
+  end
+  return rgb(int(r2 * 255 / 100.0 + 0.5), int(g2 * 255 / 100.0 + 0.5), int(b2 * 255 / 100.0 + 0.5))
+end
 def clamp(v, lo, hi)
   if v < lo return lo end
   if v > hi return hi end
@@ -516,7 +535,6 @@ def run_scene(face, seconds, marker, cfg)
 end
 
 run_scene("kartka", 32, "S1", {"temp": -20.3})
-run_scene("duży", 24, "S2", nil)
 run_scene("kartka", 6, "S3", {
   "meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8,
   "wtext": "słonecznie,przeważnie bezchmurnie,ZACHMURZENIE Z PRZELOTNYMI OPADAMI,chmury,mgła,szadź,mżawka,silna mżawka,mżawka marznąca,silna mżawka marznąca,deszcz,ulewa,deszcz marznący,silny deszcz marznący,śnieg,śnieżyca,krupa śnieżna,przelotny deszcz,ulewny przelotny deszcz,przelotny śnieg,silny przelotny śnieg,burza,burza z gradem"
@@ -535,12 +553,6 @@ run_scene("kartka", 6, "S14", {
   "tpan": false, "showpm": true, "rpan": false, "hpan": false, "moon": false, "ppan": false, "dlpan": false, "warm": true, "pm25": 12
 })
 run_scene("kartka", 4, "S7", {
-  "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
-})
-run_scene("pierścień", 4, "S8", {
-  "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
-})
-run_scene("duży", 4, "S9", {
   "meteoalarm_enabled": false, "order": "3", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "dpan": true, "warm": true
 })
 run_scene("kartka", 4, "S10", {
@@ -581,16 +593,13 @@ run_scene("kartka", 5, "S20", {
   "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false,
   "dlpan": true, "ppan": false, "warm": true
 })
-run_scene("długośćdnia", 6, "S21", {
-  "meteoalarm_enabled": false, "warm": true
-})
 var WC = [%s]
 var wi = 0
 while wi < size(WC)
   run_scene("kartka", 4, WC[wi][2], {"meteoalarm_enabled": false, "order": "1", "wpan": false, "wind": false, "dpan": false, "tpan": false, "showpm": false, "rpan": false, "hpan": false, "moon": false, "wpan": true, "wdur": 8, "wcode": WC[wi][0], "isday": WC[wi][1], "warm": true})
   wi += 1
 end
-run_scene("duży", 12, "S15", {"maev": "Opady marznące"})
+run_scene("kartka", 12, "S15", {"maev": "Opady marznące"})
 print("DONE")
 ''' % (", ".join('"%s"' % c for c in CAPS), ", ".join('"%s"' % c for c in LOWC),
        ", ".join('"%s": "%s"' % (k, v) for k, v in DIGITS.items()),
@@ -790,41 +799,46 @@ def check_weather_gifs(scenes):
         "S6: no pm25 panel"
     assert any(s6[i][y * W + x] == 0xF0DC8C for i in range(len(s6)) for y in range(0, 15) for x in range(15)), \
         "S6: no moon panel"
+    # the POKÓJ label on the room/humidity cards is a yellow->red letter gradient
+    grad6 = [i for i, f in enumerate(s6)
+             if any(f[y * W + x] == 0xFFC800 for y in range(1, 6) for x in range(15))
+             and any(f[y * W + x] == 0xFF0000 for y in range(1, 6) for x in range(15))]
+    assert grad6, "S6: no alternating red/yellow POKÓJ label"
     # negative temperature renders in the small font (rows 5-9, nothing in row 4 of the tile
     # where the big font would start) and shows the minus bar
     tempf = [i for i, f in enumerate(s6)
-             if any(f[y * W + x] == 0xFFFFFF for y in range(5, 10) for x in range(16))
-             and not any(f[y * W + x] == 0xFFFFFF for y in (4,) for x in range(16))]
+             if any(f[y * W + x] == 0x00AAFF for y in range(5, 10) for x in range(16))
+             and not any(f[y * W + x] == 0x00AAFF for y in (4,) for x in range(16))]
     assert tempf, "S6: no negative-temperature panel in the small font"
     # the first tempf frames are transition frames; the stabilized panel is the one
     # whose minus bar is fully visible: three white pixels in a row in row 7
     f = next((s6[i] for i in tempf
-              if any(all(s6[i][7 * W + x + k] == 0xFFFFFF for k in range(3))
+              if any(all(s6[i][7 * W + x + k] == 0x00AAFF for k in range(3))
                      for x in range(14))), None)
     assert f is not None, "S6: no minus bar"
-    row7 = [f[7 * W + x] == 0xFFFFFF for x in range(16)]
+    row7 = [f[7 * W + x] == 0x00AAFF for x in range(16)]
     assert any(row7[x] and row7[x + 1] and row7[x + 2] for x in range(14)), "S6: no minus bar"
     # humidity shows a single % after the digits (no doubled %%, which would reach x > 11);
     # the value moved 4px down (rows 9-13) to make room for the POKÓJ label in rows 1-5
     humi = [i for i, f in enumerate(s6)
-            if any(f[y * W + x] == 0x00AAFF for y in range(9, 14) for x in range(16))]
+            if any(f[y * W + x] == 0x00AAFF for y in range(10, 14) for x in range(16))]
     assert humi, "S6: no humidity panel"
     f = s6[humi[len(humi) // 2]]
-    bluex = [x for y in range(9, 14) for x in range(16) if f[y * W + x] == 0x00AAFF]
+    bluex = [x for y in range(10, 14) for x in range(16) if f[y * W + x] == 0x00AAFF]
     assert bluex and max(bluex) <= 11, "S6: humidity shows a doubled percent sign"
     # pressure panel: biomet green value + hPa unit on a black tile (rows 2-6 value,
     # rows 3-7 unit in the harness), no other panel uses green text
     pre = [i for i, f in enumerate(s6)
-           if any(f[y * W + x] == 0x00FF00 for y in range(2, 8) for x in range(15))]
+           if any(f[y * W + x] == 0x00FF00 for y in range(2, 8) for x in range(15))
+           and not any(f[y * W + x] == 0x00FF00 for y in (0,) for x in range(15))]
     assert pre, "S6: no pressure panel (green biomet text)"
     # day-length panel joins the default carousel: yellow value in the tile, no icon above
     dl6 = [i for i, f in enumerate(s6)
            if any(f[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(W))
-           and not any(f[y * W + x] in (0xFFC800, 0xFF7800) for y in range(1, 10) for x in range(15))]
+           and any(f[y * W + x] == 0x00FF00 for y in (0,) for x in range(15))]
     assert dl6, "S6: no day-length panel"
-    # face previews are non-empty
-    for marker in ("S7", "S8", "S9"):
-        assert any(scenes[marker][5]), "%s: empty preview frame" % marker
+    # the kartka preview is non-empty
+    assert any(scenes["S7"][5]), "S7: empty preview frame"
     # PM2.5 100 -> purple, 200 -> navy
     s10 = scenes["S10"]
     assert any(s10[i][y * W + x] == 0xC24CFF for i in range(len(s10)) for y in range(0, 16) for x in range(15)), \
@@ -862,34 +876,6 @@ def check_weather_gifs(scenes):
     pm14 = [i for i, f in enumerate(s14)
             if any(f[y * W + x] == 0x00FF00 for y in range(0, 16) for x in range(15))]
     assert not pm14, "S14: pm25 panel shown below the threshold"
-    s2 = scenes["S2"]
-    # big face: 5-letter red weekday + white date line at the bottom (the date panel is
-    # no longer first in the carousel, so find its frames)
-    datef = [i for i, f in enumerate(s2)
-             if any(f[y * W + x] == 0xFFFFFF for y in range(11, 16) for x in range(20, 52))
-             and any(f[y * W + x] == 0xFF0000 for y in range(11, 16) for x in range(25))]
-    assert datef, "no big-face date panel in S2"
-    f = s2[datef[len(datef) // 2]]
-    # big face: the alert is a scrolling unit: black METEOALARM on an alert-colored
-    # block plus the message in the alert color, moving together. Verify the
-    # signature of the design: the letter M drawn in black with the red block
-    # showing through its holes.
-    s2 = scenes["S2"]
-    M = ("#...#", "##.##", "#.#.#", "#...#", "#...#")
-    def match_m(f, x0):
-        for r, pat in enumerate(M):
-            for c, ch in enumerate(pat):
-                px = f[(11 + r) * W + x0 + c]
-                if ch == "#" and px != 0x000000:
-                    return False
-                if ch == "." and px != 0xFF0000:
-                    return False
-        return True
-    assert any(match_m(s2[i], x0) for i in range(len(s2)) for x0 in range(W - 4)), \
-        "no black METEOALARM letters on a red block"
-    assert any(s2[i][y * W + x] != s2[i + 20][y * W + x]
-               for i in range(40, 60) for y in range(11, 16) for x in range(52)), \
-        "big-face alert is not scrolling"
     # Polish diacritics in the alert message: the letter Ą (with ogonek) must render
     # as part of the red scrolling text
     s15 = scenes["S15"]
@@ -897,7 +883,7 @@ def check_weather_gifs(scenes):
     def match_ao(f, x0):
         for r, pat in enumerate(AOG):
             for c, ch in enumerate(pat):
-                if ch == "#" and f[(11 + r) * W + x0 + c] != 0xFF0000:
+                if ch == "#" and f[(10 + r) * W + x0 + c] != 0xFF0000:
                     return False
         return True
     assert any(match_ao(s15[i], x0) for i in range(len(s15)) for x0 in range(W - 3)), \
@@ -931,35 +917,25 @@ def check_weather_gifs(scenes):
     # day-length carousel panel: yellow value in the tile, the 24h bar at the bottom
     # and the week bar hidden while the panel is shown
     s20 = scenes["S20"]
+    assert any(s20[i][y * W + x] == 0x00FF00 for i in range(len(s20))
+               for y in range(0, 5) for x in range(15)), "S20: no green DŁ. label"
+    assert any(s20[i][y * W + x] == 0xFFC800 for i in range(len(s20))
+               for y in range(5, 10) for x in range(15)), "S20: no yellow DNIA label"
     assert any(s20[i][y * W + x] == 0xC24CFF for i in range(len(s20))
-               for y in range(10, 15) for x in range(W)), "S20: no purple day-length value"
+               for y in range(10, 15) for x in range(W)), "S20: no purple day-length digits"
+    assert any(s20[i][y * W + x] == 0x00AAFF for i in range(len(s20))
+               for y in range(10, 15) for x in range(W)), "S20: no blue h/min letters"
     assert any(s20[i][y * W + x] == 0x505050 for i in range(len(s20))
                for y in (15,) for x in range(W)), "S20: no gray 24h bar on the panel"
     assert any(s20[i][y * W + x] == 0xFFC800 for i in range(len(s20))
                for y in (15,) for x in range(W)), "S20: no yellow daylight segment on the panel"
+    assert any(s20[i][y * W + x] == 0xFF0000 for i in range(len(s20))
+               for y in (15,) for x in range(W)), "S20: no red current-time dot"
     f20 = s20[[i for i, f in enumerate(s20)
                if any(f[y * W + x] == 0xC24CFF for y in range(10, 15) for x in range(W))
                and any(f[y * W + x] == 0x505050 for y in (15,) for x in range(W))][0]]
     assert not any(f20[15 * W + x] in (0xFFFFFF, 0x666666) for x in range(17, 51)), \
         "S20: week bar visible during the day-length panel"
-    assert any(f20[y * W + x] == 0xFFFFFF for y in range(5, 10) for x in range(17, 35)), \
-        "S20: the hour is not full size during the day-length panel"
-    # the day-length face: gray 24h bar with a yellow sunrise-sunset segment, yellow
-    # day-length text at rows 8-12, no week bar, big white time
-    s21 = scenes["S21"]
-    assert any(s21[i][y * W + x] == 0x505050 for i in range(len(s21))
-               for y in (15,) for x in range(W)), "S21: no gray 24h bar"
-    assert any(s21[i][y * W + x] == 0xFFC800 for i in range(len(s21))
-               for y in (15,) for x in range(W)), "S21: no yellow daylight segment"
-    assert any(s21[i][y * W + x] == 0xC24CFF for i in range(len(s21))
-               for y in range(10, 15) for x in range(W)), "S21: no purple day-length value text"
-    assert not any(s21[5][15 * W + x] in (0xFFFFFF, 0x666666) for x in range(17, 51)), \
-        "S21: week bar visible on the day-length face"
-    assert any(s21[5][y * W + x] == 0xFFFFFF for y in range(0, 10) for x in range(W)), \
-        "S21: no full-size white time"
-    assert not any(s21[5][y * W + x] == 0xFFFFFF for y in range(10, 16) for x in range(W)), \
-        "S21: the hour overlaps the day-length value"
-
 
 def main():
     cache = CACHE
@@ -979,25 +955,19 @@ def main():
         print("--- stderr ---\n%s" % e.stderr[-3000:])
         raise
     scenes = parse_frames(out)
-    assert "S1" in scenes and "S2" in scenes and "S3" in scenes and "S4" in scenes and "S5" in scenes, (out[-500:])
-    assert all(k in scenes for k in ("S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20", "S21")), (out[-500:])
+    assert "S1" in scenes and "S3" in scenes and "S4" in scenes and "S5" in scenes, (out[-500:])
+    assert all(k in scenes for k in ("S6", "S7", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20")), (out[-500:])
     check_help_limits()
     checks(scenes)
     check_weather_gifs(scenes)
     docs = ROOT / "docs"
     write_gif(docs / "meteoalarm.gif", scenes["S1"])
-    write_gif(docs / "meteoalarm-big.gif", scenes["S2"])
     write_gif(docs / "moon.gif", scenes["S5"])
     write_gif(docs / "demo-carousel.gif", scenes["S6"])
     write_gif(docs / "wind.gif", scenes["S12"])
     render(scenes["S7"][5]).save(docs / "tc002-sheet.png")
-    render(scenes["S8"][5]).save(docs / "tc002-ring.png")
-    render(scenes["S9"][5]).save(docs / "tc002-big.png")
-    render(scenes["S21"][5]).save(docs / "tc002-day.png")
-    for name in ("meteoalarm.gif", "meteoalarm-big.gif"):
-        p = docs / name
-        print("%s (%d frames, %d KB)" % (p, len(scenes["S1" if "big" not in name else "S2"]),
-                                         p.stat().st_size // 1024))
+    p = docs / "meteoalarm.gif"
+    print("%s (%d frames, %d KB)" % (p, len(scenes["S1"]), p.stat().st_size // 1024))
     for marker, name, code, day in WEATHER:
         p = docs / ("weather-%s.gif" % name)
         write_gif(p, scenes[marker])
