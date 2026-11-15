@@ -24,7 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "tests" / "nimbus-template.ax"
-VERSION = "2.12.0"
+VERSION = "2.13.0"
 HELP_LIMIT = 96  # AWTRIX NG truncates @config help texts to 96 UTF-8 bytes
 
 
@@ -126,6 +126,17 @@ LANG = {
             '# @config htopic text "MQTT: Wilgotność" default="" group="Pokój" help="Na brokerze z ustawień AWTRIX. Puste używa czujnika zegara"',
             '# @config rcol color "Kolor temperatury w pokoju" default=#FFFFFF group="Pokój"',
             '# @config hcol color "Kolor wilgotności" default=#00AAFF group="Pokój"',
+            # @config abri bool "Automatyczna jasność" default=false group="Jasność" help="Jasność wg wschodu i zachodu słońca"',
+            '# @config bmin slider "Jasność minimalna" default=5 min=0 max=255 group="Jasność" help="W nocy"',
+            '# @config bmax slider "Jasność maksymalna" default=200 min=0 max=255 group="Jasność" help="W dzień"',
+            '# @config blit slider "Jasność przy świetle" default=128 min=0 max=255 group="Jasność" help="Gdy MQTT zgłasza włączone światło"',
+            '# @config ltopic text "MQTT: Stan światła" default="" group="Jasność" help="Payload: on/off, true/false lub 1/0"',
+            '# @config dlcol color "Cyfry długości dnia" default=#C24CFF group="Długość dnia"',
+            '# @config dlhcol color "h/min długości dnia" default=#00AAFF group="Długość dnia"',
+            '# @config dl1col color "Napis DŁ." default=#00FF00 group="Długość dnia"',
+            '# @config dl2col color "Napis DNIA" default=#FFC800 group="Długość dnia"',
+            '# @config rlab1 color "POKÓJ: kolor 1" default=#FF0000 group="Pokój"',
+            '# @config rlab2 color "POKÓJ: kolor 2" default=#FFC800 group="Pokój"',
         ],
     },
     "en": {
@@ -202,6 +213,17 @@ LANG = {
             '# @config htopic text "MQTT: Humidity" default="" group="Room" help="On the broker set in AWTRIX settings. Empty uses the clock sensor"',
             '# @config rcol color "Room temperature color" default=#FFFFFF group="Room"',
             '# @config hcol color "Humidity color" default=#00AAFF group="Room"',
+            # @config abri bool "Auto brightness" default=false group="Brightness" help="Brightness based on sunrise and sunset"',
+            '# @config bmin slider "Min brightness" default=5 min=0 max=255 group="Brightness" help="At night"',
+            '# @config bmax slider "Max brightness" default=200 min=0 max=255 group="Brightness" help="During the day"',
+            '# @config blit slider "Light-on brightness" default=128 min=0 max=255 group="Brightness" help="When MQTT reports the light is on"',
+            '# @config ltopic text "MQTT: Light state" default="" group="Brightness" help="Payload: on/off, true/false or 1/0"',
+            '# @config dlcol color "Day length digits" default=#C24CFF group="Day length"',
+            '# @config dlhcol color "Day length h/min" default=#00AAFF group="Day length"',
+            '# @config dl1col color "DAY label" default=#00FF00 group="Day length"',
+            '# @config dl2col color "LEN label" default=#FFC800 group="Day length"',
+            '# @config rlab1 color "ROOM color 1" default=#FF0000 group="Room"',
+            '# @config rlab2 color "ROOM color 2" default=#FFC800 group="Room"',
         ],
     },
     "de": {
@@ -278,6 +300,17 @@ LANG = {
             '# @config htopic text "MQTT: Luftfeuchte" default="" group="Raum" help="Auf dem Broker aus den AWTRIX-Einstellungen. Leer nutzt den Uhr-Sensor"',
             '# @config rcol color "Farbe der Raumtemperatur" default=#FFFFFF group="Raum"',
             '# @config hcol color "Farbe der Luftfeuchte" default=#00AAFF group="Raum"',
+            # @config abri bool "Automatische Helligkeit" default=false group="Helligkeit" help="Helligkeit nach Sonnenauf- und -untergang"',
+            '# @config bmin slider "Minimale Helligkeit" default=5 min=0 max=255 group="Helligkeit" help="Nachts"',
+            '# @config bmax slider "Maximale Helligkeit" default=200 min=0 max=255 group="Helligkeit" help="Tagsüber"',
+            '# @config blit slider "Helligkeit bei Licht" default=128 min=0 max=255 group="Helligkeit" help="Wenn MQTT meldet, dass das Licht an ist"',
+            '# @config ltopic text "MQTT: Lichtstatus" default="" group="Helligkeit" help="Payload: on/off, true/false oder 1/0"',
+            '# @config dlcol color "Tageslänge Ziffern" default=#C24CFF group="Tageslänge"',
+            '# @config dlhcol color "Tageslänge h/min" default=#00AAFF group="Tageslänge"',
+            '# @config dl1col color "TAG Beschriftung" default=#00FF00 group="Tageslänge"',
+            '# @config dl2col color "DAU. Beschriftung" default=#FFC800 group="Tageslänge"',
+            '# @config rlab1 color "RAUM Farbe 1" default=#FF0000 group="Raum"',
+            '# @config rlab2 color "RAUM Farbe 2" default=#FFC800 group="Raum"',
         ],
     },
     "es": {
@@ -354,6 +387,17 @@ LANG = {
             '# @config htopic text "MQTT: Humedad" default="" group="Habitación" help="En el broker de los ajustes de AWTRIX. Vacío usa el sensor del reloj"',
             '# @config rcol color "Color de la temperatura" default=#FFFFFF group="Habitación"',
             '# @config hcol color "Color de la humedad" default=#00AAFF group="Habitación"',
+            # @config abri bool "Brillo automático" default=false group="Brillo" help="Brillo según la salida y puesta del sol"',
+            '# @config bmin slider "Brillo mínimo" default=5 min=0 max=255 group="Brillo" help="De noche"',
+            '# @config bmax slider "Brillo máximo" default=200 min=0 max=255 group="Brillo" help="De día"',
+            '# @config blit slider "Brillo con luz" default=128 min=0 max=255 group="Brillo" help="Cuando MQTT indica que la luz está encendida"',
+            '# @config ltopic text "MQTT: Estado de la luz" default="" group="Brillo" help="Payload: on/off, true/false o 1/0"',
+            '# @config dlcol color "Dígitos de la duración del día" default=#C24CFF group="Duración del día"',
+            '# @config dlhcol color "Duración del día h/min" default=#00AAFF group="Duración del día"',
+            '# @config dl1col color "Etiqueta DIA" default=#00FF00 group="Duración del día"',
+            '# @config dl2col color "Etiqueta DUR." default=#FFC800 group="Duración del día"',
+            '# @config rlab1 color "HABITACIÓN color 1" default=#FF0000 group="Habitación"',
+            '# @config rlab2 color "HABITACIÓN color 2" default=#FFC800 group="Habitación"',
         ],
     },
     "pt": {
@@ -430,6 +474,17 @@ LANG = {
             '# @config htopic text "MQTT: Humidade" default="" group="Quarto" help="No broker das definições do AWTRIX. Vazio usa o sensor do relógio"',
             '# @config rcol color "Cor da temperatura do quarto" default=#FFFFFF group="Quarto"',
             '# @config hcol color "Cor da humidade" default=#00AAFF group="Quarto"',
+            # @config abri bool "Brilho automático" default=false group="Brilho" help="Brilho conforme o nascer e o pôr do sol"',
+            '# @config bmin slider "Brilho mínimo" default=5 min=0 max=255 group="Brilho" help="À noite"',
+            '# @config bmax slider "Brilho máximo" default=200 min=0 max=255 group="Brilho" help="Durante o dia"',
+            '# @config blit slider "Brilho com luz" default=128 min=0 max=255 group="Brilho" help="Quando o MQTT indica que a luz está acesa"',
+            '# @config ltopic text "MQTT: Estado da luz" default="" group="Brilho" help="Payload: on/off, true/false ou 1/0"',
+            '# @config dlcol color "Dígitos da duração do dia" default=#C24CFF group="Duração do dia"',
+            '# @config dlhcol color "Duração do dia h/min" default=#00AAFF group="Duração do dia"',
+            '# @config dl1col color "Rótulo DIA" default=#00FF00 group="Duração do dia"',
+            '# @config dl2col color "Rótulo DUR." default=#FFC800 group="Duração do dia"',
+            '# @config rlab1 color "QUARTO cor 1" default=#FF0000 group="Quarto"',
+            '# @config rlab2 color "QUARTO cor 2" default=#FFC800 group="Quarto"',
         ],
     },
 }

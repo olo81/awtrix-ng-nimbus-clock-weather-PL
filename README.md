@@ -1,7 +1,7 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-[![Version](https://img.shields.io/badge/version-2.12.0%20PL-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-2.13.0%20PL-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -15,6 +15,24 @@
 **NimbusPL** to rozbudowany, w pełni spolszczony fork popularnej aplikacji **Nimbus** przeznaczony dla zegarów z małą matrycą LED (52x16) sterowanych oprogramowaniem **AWTRIX Light** lub **Awtrix NG** (np. Ulanzi TC002).
 
 Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z Open-Meteo, stężenia pyłów **PM2.5**, odczytów temperatury i wilgotności w pomieszczeniu, ostrzeżeń **Meteoalarm** (IMGW) oraz serii efektów wizualnych (m.in. efekt wycieraczki chroniący matrycę przed powidokami).
+
+---
+
+## 🆕 Nowości w v2.13.0 PL
+
+### 💡 Automatyczna jasność (wschód/zachód słońca + MQTT)
+
+- Nowa grupa **`Jasność`**: aplikacja reguluje jasność matrycy wg **wschodu i zachodu słońca** (płynny przejazd ±30 min wokół tych momentów).
+- Suwaki: **`Jasność minimalna`** (noc), **`Jasność maksymalna`** (dzień) i **`Jasność przy świetle`** — ta ostatnia używana, gdy przez MQTT (Home Assistant) przychodzi informacja, że **światło jest włączone**.
+- Temat **`MQTT: Stan światła`** (payload: `on/off`, `true/false` lub `1/0`). Gdy światło włączone, zegar **szybko rozjaśnia się** do podwyższonej wartości (domyślnie 128 ≈ 50%), a po wyłączeniu **szybko wygasza** do poziomu wynikającego z pory dnia (płynny przejazd ~2–4 s).
+
+### 🎨 Kolory długości dnia i etykiety `POKÓJ`
+
+- Nowe opcje kolorów: **cyfry** i **`h`/`min`** długości dnia oraz napisy **`DŁ.`** i **`DNIA`** (grupa *Długość dnia*), a także **dwa kolory** naprzemiennej etykiety **`POKÓJ`** (grupa *Pokój*).
+
+### 🌙 Nocne ikonki pogody
+
+- Stany **`przeważnie bezchmurnie`** (WMO 1) i **`przelotne zachmurzenie`** (WMO 2) mają teraz **wersje nocne z księżycem i chmurami** — w nocy nie pokazują już słońca.
 
 ---
 
@@ -319,7 +337,7 @@ Aplikacja ma **jedną tarczę — `kartka`** (bez wyboru w opcjach):
 | <img src="docs/weather-snieg.gif" width="200"><br>Śnieg | <img src="docs/weather-sniezyca.gif" width="200"><br>Śnieżyca | <img src="docs/weather-krupa-sniezna.gif" width="200"><br>Krupa śnieżna |
 | <img src="docs/weather-przelotny-deszcz.gif" width="200"><br>Przelotny deszcz | <img src="docs/weather-ulewny-przelotny-deszcz.gif" width="200"><br>Ulewny przelotny deszcz | <img src="docs/weather-przelotny-snieg.gif" width="200"><br>Przelotny śnieg |
 | <img src="docs/weather-silny-przelotny-snieg.gif" width="200"><br>Silny przelotny śnieg | <img src="docs/weather-burza.gif" width="200"><br>Burza | <img src="docs/weather-burza-z-gradem.gif" width="200"><br>Burza z gradem |
-| <img src="docs/weather-burza-z-silnym-gradem.gif" width="200"><br>Burza z silnym gradem | | |
+| <img src="docs/weather-burza-z-silnym-gradem.gif" width="200"><br>Burza z silnym gradem | <img src="docs/weather-przewaznie-bezchmurnie-noc.gif" width="200"><br>Przeważnie bezchmurnie (noc) | <img src="docs/weather-przelotne-zachmurzenie-noc.gif" width="200"><br>Przelotne zachmurzenie (noc) |
 
 ### 3. ⛅ Ciśnienie Atmosferyczne i Biomet
 - Panel karuzeli **`Ciśnienie`** — wartość `pressure_msl` z Open-Meteo z **jednostką `hPa`** (odstęp 1 piksela).
@@ -423,6 +441,7 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `9. Meteoalarm` | `nie` | Panel numer 9 (ostrzeżenia IMGW) |
 | | `10. Ciśnienie` | `tak` | Panel numer 10 (hPa z biometem) |
 | | `11. Długość dnia` | `tak` | Panel numer 11 (kafelek `DŁ.`/`DNIA`, wartość `11h 25min`, pasek 24 h z czerwoną kropką) |
+| **Długość dnia** | `Cyfry` / `h/min` / `DŁ.` / `DNIA` | — | Kolory napisów panelu długości dnia |
 | | `Kolejność (numery)` | *(puste)* | Numery paneli po przecinku, np. `1,2,3,4,5,6,7,8,9,10,11`; puste = domyślna |
 | | `Czas daty`, `Czas paneli` | `10s / 3s` | Czas wyświetlania daty oraz pozostałych paneli |
 | | `Czas panelu pogody` | `10 s` | Osobny czas panelu pogody (ikonka + przewijany opis) |
@@ -443,6 +462,12 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `Częstotliwość w trakcie zagrożenia` | `10 min` | Co ile minut pokazywać komunikat, gdy ostrzeżenie obowiązuje |
 | | `Częstotliwość przed zagrożeniem` | `60 min` | Co ile minut pokazywać komunikat, zanim ostrzeżenie się rozpocznie |
 | **Pokój** | `MQTT Topics` | — | Ścieżki MQTT dla temperatury i wilgotności z Home Assistant |
+| | `POKÓJ: kolor 1` / `kolor 2` | czerwony / żółty | Kolory naprzemiennych liter etykiety `POKÓJ` |
+| **Jasność** | `Automatyczna jasność` | `nie` | Jasność wg wschodu i zachodu słońca |
+| | `Jasność minimalna` | `5` | Jasność w nocy (0–255) |
+| | `Jasność maksymalna` | `200` | Jasność w dzień (0–255) |
+| | `Jasność przy świetle` | `128` | Jasność, gdy MQTT zgłasza włączone światło |
+| | `MQTT: Stan światła` | *(puste)* | Temat MQTT stanu światła; payload on/off, true/false lub 1/0 |
 
 ---
 

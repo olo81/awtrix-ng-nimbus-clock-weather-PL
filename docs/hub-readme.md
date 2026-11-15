@@ -13,7 +13,7 @@ Dostępne wersje językowe: **PL**, **EN**, **DE**, **ES**, **PT** — każda z 
 ## ✨ Najważniejsze funkcje / Key features
 
 - 🎨 **Jedna tarcza `kartka`** — kalendarz z efektem zrywania kartki, godzina przy górnej krawędzi, kafelek karuzeli po lewej. Bez zbędnych wyborów.
-- 🌦️ **Pogoda w pełnej rozdzielczości** — wszystkie 25 kodów WMO Open-Meteo z własnymi ikonkami, animowanymi opadami i opisami w Twoim języku (fioletowy opis pod ikonką, przewijany gdy długi). Dla marznących opadów — animacja **postaci w czerwonej kurtce, która wchodzi, ślizga się, przewraca, wstaje i wychodzi z ekranu** 🧊.
+- 🌦️ **Pogoda w pełnej rozdzielczości** — wszystkie kody WMO Open-Meteo z własnymi ikonkami (w tym **nocne wersje z księżycem** dla bezchmurnego/przelotnego zachmurzenia), animowanymi opadami i opisami w Twoim języku (fioletowy opis pod ikonką, przewijany gdy długi). Dla marznących opadów — animacja **postaci w czerwonej kurtce, która wchodzi, ślizga się, przewraca, wstaje i wychodzi z ekranu** 🧊.
 - 🌬️ **Porywy wiatru** — czerwono-biała powiewająca flaga + prędkość (pojawia się dopiero powyżej ustawionego progu).
 - 🍃 **PM2.5** — kafelek w kolorze poziomu (zielony → żółty → pomarańczowy → czerwony → fioletowy → granatowy), pokazywany dopiero od ustawionego progu (domyślnie 30 µg/m³). Dane domyślnie z Open-Meteo, opcjonalnie z **Airly** lub **MQTT**.
 - ⛅ **Ciśnienie z biometem** — wartość i `hPa` w kolorze wpływu na samopoczucie: 🟢 zielony (korzystny), 🟡 żółty (umiarkowany), 🔴 czerwony (bardzo niekorzystny) — na podstawie wartości i jej zmiany z 24 h.
@@ -22,6 +22,7 @@ Dostępne wersje językowe: **PL**, **EN**, **DE**, **ES**, **PT** — każda z 
 - 🌅 **Długość dnia** — kafelek karuzeli z zielonym `DŁ.` i żółtym `DNIA`, wartością `11h 25min` (cyfry fioletowe, `h`/`min` niebieskie) i 1-pikselowym paskiem 24 h (żółty odcinek wschód–zachód słońca + czerwona kropka 1 px aktualnej godziny).
 - 🚨 **Meteoalarm (IMGW)** — ostrzeżenia pogodowe z czasem zagrożenia, przejmujące karuzelę co kilka minut (osobna częstotliwość przed i w trakcie zagrożenia). Wersja **PL**: powiat wyznaczany automatycznie ze współrzędnych (lub ręcznie po TERYT). Wersje **EN/DE/ES/PT**: bez TERYT — najwyższy aktywny alert z całej Polski.
 - 🎛️ **Karuzela 11 paneli z numerami** — każdy panel ma własny przełącznik, a kolejność ustalasz wpisując numery po przecinku w polu `Kolejność (numery)`.
+- 💡 **Automatyczna jasność** — jasność wg wschodu/zachodu słońca (suwaki min/max) + podwyższona jasność, gdy MQTT (Home Assistant) zgłasza włączone światło.
 - 🧹 **Efekt wycieraczki** — pas czyszczący matrycę co 5 minut.
 
 ## 📸 Podgląd

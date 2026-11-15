@@ -84,7 +84,9 @@ WEATHER = [
     ("W0", "slonecznie", 0, 1),
     ("WN", "slonecznie-noc", 0, 0),
     ("W1", "przewaznie-bezchmurnie", 1, 1),
+    ("W1N", "przewaznie-bezchmurnie-noc", 1, 0),
     ("W2", "zachmurzenie", 2, 1),
+    ("W2N", "przelotne-zachmurzenie-noc", 2, 0),
     ("W3", "chmury", 3, 1),
     ("W45", "mgla", 45, 1),
     ("W48", "szadz", 48, 1),
@@ -318,7 +320,7 @@ class _Store
       "chc": 0xFF0000, "ctc": 0x000000, "cbc": 0xFFFFFF, "wbar": true, "wmon": true,
       "wtd": 0xFFFFFF, "wod": 0x666666, "wtw": 0xFFFFFF, "wow": 0x666666,
       "tran": "przetarcie", "ddur": 2, "pdur": 2, "wdur": 2, "moon": true, "wind": true, "ppan": true,
-      "airlykey": "", "ttopic": "", "pmtopic": "", "dlpan": true, "dldur": 5, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
+      "airlykey": "", "ttopic": "", "pmtopic": "", "dlpan": true, "dldur": 5, "abri": false, "bmin": 5, "bmax": 200, "blit": 128, "ltopic": "", "dlcol": 0xC24CFF, "dlhcol": 0x00AAFF, "dl1col": 0x00FF00, "dl2col": 0xFFC800, "rlab1": 0xFF0000, "rlab2": 0xFFC800, "rcol": 0xFFFFFF, "hcol": 0x00AAFF,
       "nauto": false, "nfrom": 22, "nto": 7, "nbar": true, "npause": false, "nbri": 0,
       "face": face, "canim": false, "dfmt": "dd.mm.yy", "showpm": true,
       "order": "", "lat": 52.23, "lon": 21.01,
@@ -772,6 +774,8 @@ def check_weather_gifs(scenes):
     assert anyc(scenes["W0"], 0xFFC800, 1, 9, 0, 15), "W0: no yellow sun"
     assert anyc(scenes["WN"], 0xF0DC8C, 1, 9, 0, 15), "WN: no moon"
     assert anyc(scenes["W1"], 0xFFC800, 1, 9, 0, 15), "W1: no sun behind the cloud"
+    assert anyc(scenes["W1N"], 0xF0DC8C, 1, 9, 0, 15), "W1N: no moon behind the cloud"
+    assert anyc(scenes["W2N"], 0xF0DC8C, 1, 9, 0, 15), "W2N: no moon behind the cloud"
     for marker in ("W95", "W96", "W99"):
         assert anyc(scenes[marker], 0xFFC800, 1, 10, 0, 15), "%s: no lightning flash" % marker
     # fog alternates between its two layer bitmaps (700 ms apart)
