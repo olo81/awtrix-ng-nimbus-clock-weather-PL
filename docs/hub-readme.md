@@ -23,6 +23,7 @@ Dostępne wersje językowe: **PL**, **EN**, **DE**, **ES**, **PT** — każda z 
 - 🚨 **Meteoalarm (IMGW)** — ostrzeżenia pogodowe z czasem zagrożenia, przejmujące karuzelę co kilka minut (osobna częstotliwość przed i w trakcie zagrożenia). Wersja **PL**: powiat wyznaczany automatycznie ze współrzędnych (lub ręcznie po TERYT). Wersje **EN/DE/ES/PT**: bez TERYT — najwyższy aktywny alert z całej Polski.
 - 🎛️ **Karuzela 11 paneli z numerami** — każdy panel ma własny przełącznik, a kolejność ustalasz wpisując numery po przecinku w polu `Kolejność (numery)`.
 - 💡 **Automatyczna jasność** — jasność wg wschodu/zachodu słońca (suwaki min/max) + podwyższona jasność, gdy MQTT (Home Assistant) zgłasza włączone światło.
+- 📡 **Karty awarii** — brak WiFi lub MQTT (Home Assistant): w rotacji pojawia się karta alarmowa (czerwona `BRAK WIFI` / niebieska `AWARIA HA`) z dużym logo w kafelku i napisem pod godziną, a karty zależne od niedostępnej usługi są automatycznie wyłączane z rotacji. Wykrywanie automatyczne (ping HTTP co 60 s + heartbeat MQTT `nimbuspl/hb` co 30 s), czas wyświetlania ustawialny suwakiem.
 - 🧹 **Efekt wycieraczki** — pas czyszczący matrycę co 5 minut.
 
 ## 📸 Podgląd

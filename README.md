@@ -1,7 +1,7 @@
 # NimbusPL – Zegar z kalendarzem, pogodą, PM2.5 i Meteoalarmem (AWTRIX NG / AWTRIX Light)
 
 [![AWTRIX](https://img.shields.io/badge/AWTRIX-Berry%20App-blue.svg)](https://bluebeards.org/awtrix/)
-[![Version](https://img.shields.io/badge/version-2.13.0%20PL-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/version-2.14.0%20PL-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 <p align="center">
@@ -15,6 +15,21 @@
 **NimbusPL** to rozbudowany, w pełni spolszczony fork popularnej aplikacji **Nimbus** przeznaczony dla zegarów z małą matrycą LED (52x16) sterowanych oprogramowaniem **AWTRIX Light** lub **Awtrix NG** (np. Ulanzi TC002).
 
 Aplikacja płynnie łączy wyświetlanie zegara, kalendarza, prognozy pogody z Open-Meteo, stężenia pyłów **PM2.5**, odczytów temperatury i wilgotności w pomieszczeniu, ostrzeżeń **Meteoalarm** (IMGW) oraz serii efektów wizualnych (m.in. efekt wycieraczki chroniący matrycę przed powidokami).
+
+---
+
+## 🆕 Nowości w v2.14.0 PL
+
+### 📡 Karty awarii — WiFi i Home Assistant
+
+- Gdy **WiFi zanika**, karty zależne od internetu (pogoda, porywy wiatru, PM2.5, meteoalarm, ciśnienie, długość dnia, temperatura z Open-Meteo/Airly) znikają z rotacji, a pojawia się **czerwona karta `BRAK WIFI`** z ikonką i przewijanym napisem.
+- Gdy **MQTT (Home Assistant) nie odpowiada**, karty zasilane przez broker (temperatura/wilgotność pokoju przez MQTT, nadpisania pogody/PM2.5) znikają z rotacji, a pojawia się **niebieska karta `AWARIA HA`** z ikonką domku.
+- Wykrywanie działa w pełni automatycznie, bez konfiguracji po stronie Home Assistanta:
+  - **WiFi** — lekki „ping" HTTP do Open-Meteo co 60 s (status `0` = brak sieci);
+  - **MQTT/HA** — heartbeat: zegar co 30 s publikuje na temat `nimbuspl/hb` i nasłuchuje własnej wiadomości; brak odpowiedzi przez ~100 s oznacza awarię brokera.
+- Karty działające offline (kalendarz, faza księżyca, odczyty z czujnika zegara) **zostają w rotacji**.
+- Przy braku WiFi karta HA jest domyślnie ukryta (awaria MQTT jest wtedy skutkiem braku sieci).
+- **Wygląd i czas**: duże logo (wifi / domek) w kafelku i napis **pod godziną** (przewijany, gdy się nie mieści) — jak opis pogody. Czas wyświetlania ustawisz suwakiem **`Czas kafelków awarii`** (grupa *Karuzela*, domyślnie 5 s).
 
 ---
 
@@ -369,6 +384,11 @@ Aplikacja ma **jedną tarczę — `kartka`** (bez wyboru w opcjach):
 - 100% przetłumaczonych opcji, kategorii, opisów i podpowiedzi w panelu WWW AWTRIX.
 - Poprawiony parser Berry (`re.search`) – wyeliminowano błędy `syntax_error` przy pobieraniu danych JSON.
 
+### 8. 📡 Karty awarii (WiFi / Home Assistant)
+- Zanik **WiFi** → czerwona karta **`BRAK WIFI`** w rotacji; karty zależne od internetu są automatycznie wyłączane.
+- Awaria **MQTT (Home Assistant)** → niebieska karta **`AWARIA HA`**; karty zasilane przez MQTT są wyłączane z rotacji.
+- Wykrywanie automatyczne: ping HTTP co 60 s (WiFi) i własny heartbeat MQTT `nimbuspl/hb` co 30 s (HA) — bez konfiguracji po stronie HA.
+
 ---
 
 ## ⚙️ Instrukcja Instalacji
@@ -445,6 +465,7 @@ Każdy panel ma **swój przełącznik i numer** (wszystkie przełączniki w grup
 | | `Kolejność (numery)` | *(puste)* | Numery paneli po przecinku, np. `1,2,3,4,5,6,7,8,9,10,11`; puste = domyślna |
 | | `Czas daty`, `Czas paneli` | `10s / 3s` | Czas wyświetlania daty oraz pozostałych paneli |
 | | `Czas panelu pogody` | `10 s` | Osobny czas panelu pogody (ikonka + przewijany opis) |
+| | `Czas kafelków awarii` | `5 s` | Czas wyświetlania kart `BRAK WIFI` i `AWARIA HA` |
 | | `Próg porywów wiatru` | `40 km/h` | Porywy muszą przekroczyć ten próg (10–100 km/h), by kafelek pojawił się w rotacji |
 | | `Próg PM2.5` | `30` | Stężenie musi osiągnąć ten próg (1–100 µg/m³), by kafelek PM2.5 pojawił się w rotacji |
 | | `Przejście` | `przetarcie` | Animacja przejścia (`przetarcie`, `zanikanie`, `przejście`, `dół`, `góra`, `lewo`, `prawo`, `brak`) |
